@@ -20,6 +20,7 @@ def create_task(task_in: TaskCreate, session: Session = Depends(get_session)) ->
     return TaskRead.model_validate(task)
 
 
+# Memperbarui sebagian atau seluruh field task berdasarkan ID.
 @router.put("/{task_id}", response_model=TaskRead, status_code=status.HTTP_200_OK)
 def update_task(
     task_id: int,
@@ -37,6 +38,7 @@ def update_task(
     return TaskRead.model_validate(updated_task)
 
 
+# Menghapus task berdasarkan ID dan mengembalikan status 204 No Content.
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int, session: Session = Depends(get_session)) -> Response:
     task = task_service.get_task_by_id(session, task_id)
