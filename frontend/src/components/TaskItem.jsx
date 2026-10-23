@@ -24,7 +24,7 @@ export default function TaskItem({
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [itemError, setItemError] = useState('')
 
-  // Memperbarui status task secara instan saat dropdown status diubah pengguna.
+  // Memperbarui status task saat dropdown status diubah pengguna.
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value
     if (newStatus === task.status) return

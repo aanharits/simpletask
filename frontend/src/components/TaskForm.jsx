@@ -14,7 +14,7 @@ export default function TaskForm({
   const [status, setStatus] = useState(initialData?.status || 'Todo')
   const [error, setError] = useState('')
 
-  // Memvalidasi batas input form sebelum mengirim payload ke fungsi onSubmit.
+  // Memvalidasi input form sebelum mengirim payload ke fungsi onSubmit.
   const handleSubmit = async (e) => {
     e.preventDefault()
     const trimmedTitle = title.trim()
