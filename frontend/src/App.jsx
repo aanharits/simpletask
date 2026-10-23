@@ -32,27 +32,15 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    let isMounted = true
-
     getTasks()
-      .then((data) => {
-        if (isMounted) setTasks(data || [])
-      })
+      .then((data) => setTasks(data || []))
       .catch((err) => {
-        if (isMounted) {
-          setLoadError(
-            err.message ||
-              'Could not connect to the backend API. Please make sure the backend is running.'
-          )
-        }
+        setLoadError(
+          err.message ||
+            'Could not connect to the backend API. Please make sure the backend is running.'
+        )
       })
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
-
-    return () => {
-      isMounted = false
-    }
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {

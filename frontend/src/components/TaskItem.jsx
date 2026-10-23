@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import TaskForm from './TaskForm'
 
+const STATUS_CLASS_MAP = {
+  'In Progress': 'status-in-progress',
+  'Done': 'status-done',
+  'Todo': 'status-todo',
+}
+
 function getStatusClass(status) {
-  switch (status) {
-    case 'In Progress':
-      return 'status-in-progress'
-    case 'Done':
-      return 'status-done'
-    case 'Todo':
-    default:
-      return 'status-todo'
-  }
+  return STATUS_CLASS_MAP[status] || 'status-todo'
 }
 
 export default function TaskItem({
