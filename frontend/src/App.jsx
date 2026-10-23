@@ -32,15 +32,21 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    getTasks()
-      .then((data) => setTasks(data || []))
-      .catch((err) => {
+    const fetchInitialTasks = async () => {
+      try {
+        const data = await getTasks()
+        setTasks(data || [])
+      } catch (err) {
         setLoadError(
           err.message ||
             'Could not connect to the backend API. Please make sure the backend is running.'
         )
-      })
-      .finally(() => setLoading(false))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchInitialTasks()
   }, [])
 
   useEffect(() => {
