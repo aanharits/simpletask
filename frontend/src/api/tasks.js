@@ -1,48 +1,41 @@
 /**
  * API client module for interacting with the /tasks backend.
- * Uses browser fetch with clean error handling and response normalization.
+ * Uses Axios with baseURL configuration and normalized error handling.
  */
+
+import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+})
+
 /**
- * Helper to handle fetch responses safely, avoiding JSON parsing errors on 204
- * and extracting user-facing error messages from 4xx/5xx responses.
+ * Normalizes Axios error responses into user-friendly Error objects.
+ * Extracts FastAPI validation details (array of errors) or custom string details.
  */
-async function handleResponse(response) {
-  if (response.status === 204) {
-    return null
-  }
-
-  let data = null
-  const contentType = response.headers.get('content-type')
-  if (contentType && contentType.includes('application/json')) {
-    try {
-      data = await response.json()
-    } catch {
-      data = null
+export function normalizeError(error) {
+  let message = 'An unexpected error occurred.'
+  if (error.response?.data?.detail) {
+    const detail = error.response.data.detail
+    if (Array.isArray(detail)) {
+      message = detail.map((err) => err.msg || JSON.stringify(err)).join(', ')
+    } else if (typeof detail === 'string') {
+      message = detail
     }
+  } else if (error.message) {
+    message = error.message
   }
 
-  if (!response.ok) {
-    let message = 'An unexpected error occurred.'
-    if (data && data.detail) {
-      if (Array.isArray(data.detail)) {
-        // FastAPI validation errors
-        message = data.detail.map((err) => err.msg || JSON.stringify(err)).join(', ')
-      } else if (typeof data.detail === 'string') {
-        message = data.detail
-      }
-    } else if (response.statusText) {
-      message = response.statusText
-    }
-    const error = new Error(message)
-    error.status = response.status
-    error.data = data
-    throw error
-  }
-
-  return data
+  const normalized = new Error(message)
+  normalized.status = error.response?.status
+  normalized.data = error.response?.data
+  return normalized
 }
 
 /**
@@ -50,12 +43,12 @@ async function handleResponse(response) {
  * @returns {Promise<Array>} List of tasks
  */
 export async function getTasks() {
-  const response = await fetch(`${BASE_URL}/tasks`, {
-    headers: {
-      Accept: 'application/json',
-    },
-  })
-  return handleResponse(response)
+  try {
+    const response = await apiClient.get('/tasks')
+    return response.data
+  } catch (error) {
+    throw normalizeError(error)
+  }
 }
 
 /**
@@ -64,15 +57,12 @@ export async function getTasks() {
  * @returns {Promise<Object>} Created task with generated ID
  */
 export async function createTask(payload) {
-  const response = await fetch(`${BASE_URL}/tasks`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-  return handleResponse(response)
+  try {
+    const response = await apiClient.post('/tasks', payload)
+    return response.data
+  } catch (error) {
+    throw normalizeError(error)
+  }
 }
 
 /**
@@ -82,15 +72,12 @@ export async function createTask(payload) {
  * @returns {Promise<Object>} Updated task
  */
 export async function updateTask(taskId, payload) {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-  return handleResponse(response)
+  try {
+    const response = await apiClient.put(`/tasks/${taskId}`, payload)
+    return response.data
+  } catch (error) {
+    throw normalizeError(error)
+  }
 }
 
 /**
@@ -99,8 +86,10 @@ export async function updateTask(taskId, payload) {
  * @returns {Promise<null>}
  */
 export async function deleteTask(taskId) {
-  const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-    method: 'DELETE',
-  })
-  return handleResponse(response)
+  try {
+    const response = await apiClient.delete(`/tasks/${taskId}`)
+    return response.data || null
+  } catch (error) {
+    throw normalizeError(error)
+  }
 }

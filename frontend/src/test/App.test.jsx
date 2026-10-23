@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
+import { apiClient, normalizeError } from '../api/tasks'
 
 const mockTasks = [
   {
@@ -18,23 +19,13 @@ const mockTasks = [
   },
 ]
 
-describe('Task Tracker App Component Tests', () => {
+describe('Task Tracker App Component Tests (with Axios)', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('renders tasks loaded from API', async () => {
-    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
-      if (url.includes('/tasks')) {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          headers: new Headers({ 'content-type': 'application/json' }),
-          json: async () => mockTasks,
-        })
-      }
-      return Promise.reject(new Error('Unknown URL'))
-    })
+  it('renders tasks loaded via Axios', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
 
     render(<App />)
 
@@ -48,12 +39,7 @@ describe('Task Tracker App Component Tests', () => {
   })
 
   it('displays empty state when no tasks are returned', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => [],
-    })
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
 
     render(<App />)
 
@@ -62,14 +48,10 @@ describe('Task Tracker App Component Tests', () => {
     })
   })
 
-  it('validates required title on submit', async () => {
+  it('validates required title on submit before network request', async () => {
     const user = userEvent.setup()
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => [],
-    })
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
+    const postSpy = vi.spyOn(apiClient, 'post')
 
     render(<App />)
 
@@ -82,31 +64,20 @@ describe('Task Tracker App Component Tests', () => {
     await user.click(screen.getByRole('button', { name: /create task/i }))
 
     expect(screen.getByText(/title cannot be empty/i)).toBeInTheDocument()
+    expect(postSpy).not.toHaveBeenCalled()
   })
 
-  it('creates a task without reloading and displays it in list', async () => {
+  it('creates a task via Axios POST and displays it in list without reload', async () => {
     const user = userEvent.setup()
 
-    vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
-      if (options?.method === 'POST') {
-        return Promise.resolve({
-          ok: true,
-          status: 201,
-          headers: new Headers({ 'content-type': 'application/json' }),
-          json: async () => ({
-            id: 3,
-            title: 'New Integration Test Task',
-            description: 'Created from form',
-            status: 'Todo',
-          }),
-        })
-      }
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => [],
-      })
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
+    vi.spyOn(apiClient, 'post').mockResolvedValue({
+      data: {
+        id: 3,
+        title: 'New Integration Test Task',
+        description: 'Created from form',
+        status: 'Todo',
+      },
     })
 
     render(<App />)
@@ -125,29 +96,17 @@ describe('Task Tracker App Component Tests', () => {
     expect(screen.getByText('Created from form')).toBeInTheDocument()
   })
 
-  it('updates task status through quick selector', async () => {
+  it('updates task status through quick selector via Axios PUT', async () => {
     const user = userEvent.setup()
 
-    vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
-      if (options?.method === 'PUT') {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          headers: new Headers({ 'content-type': 'application/json' }),
-          json: async () => ({
-            id: 1,
-            title: 'Design API contract',
-            description: 'Document endpoints and models',
-            status: 'Done',
-          }),
-        })
-      }
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => [mockTasks[0]],
-      })
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
+    vi.spyOn(apiClient, 'put').mockResolvedValue({
+      data: {
+        id: 1,
+        title: 'Design API contract',
+        description: 'Document endpoints and models',
+        status: 'Done',
+      },
     })
 
     render(<App />)
@@ -164,69 +123,18 @@ describe('Task Tracker App Component Tests', () => {
     })
   })
 
-  it('deletes a task after confirmation', async () => {
+  it('edits title and description in-place and saves via Axios PUT', async () => {
     const user = userEvent.setup()
 
-    vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
-      if (options?.method === 'DELETE') {
-        return Promise.resolve({
-          ok: true,
-          status: 204,
-          headers: new Headers(),
-          json: async () => null,
-        })
-      }
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => [mockTasks[0]],
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
+    vi.spyOn(apiClient, 'put').mockImplementation((url, body) =>
+      Promise.resolve({
+        data: {
+          ...mockTasks[0],
+          ...body,
+        },
       })
-    })
-
-    render(<App />)
-
-    await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
-    })
-
-    // Click Delete button
-    await user.click(screen.getByRole('button', { name: /delete task/i }))
-
-    // Confirm button appears
-    const confirmBtn = screen.getByRole('button', { name: /yes, delete/i })
-    expect(confirmBtn).toBeInTheDocument()
-
-    await user.click(confirmBtn)
-
-    await waitFor(() => {
-      expect(screen.queryByRole('heading', { name: 'Design API contract' })).not.toBeInTheDocument()
-    })
-  })
-
-  it('edits title and description in-place and saves changes', async () => {
-    const user = userEvent.setup()
-
-    vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
-      if (options?.method === 'PUT') {
-        const body = JSON.parse(options.body)
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          headers: new Headers({ 'content-type': 'application/json' }),
-          json: async () => ({
-            ...mockTasks[0],
-            ...body,
-          }),
-        })
-      }
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => [mockTasks[0]],
-      })
-    })
+    )
 
     render(<App />)
 
@@ -257,12 +165,7 @@ describe('Task Tracker App Component Tests', () => {
   it('filters task list by status pill and restores all', async () => {
     const user = userEvent.setup()
 
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-      ok: true,
-      status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => mockTasks,
-    })
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
 
     render(<App />)
 
@@ -275,7 +178,6 @@ describe('Task Tracker App Component Tests', () => {
     const inProgressPill = screen.getByRole('button', { name: /In Progress/i })
     await user.click(inProgressPill)
 
-    // Only 'Implement database models' should be visible
     expect(screen.queryByRole('heading', { name: 'Design API contract' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Implement database models' })).toBeInTheDocument()
 
@@ -291,14 +193,63 @@ describe('Task Tracker App Component Tests', () => {
     expect(screen.getByRole('heading', { name: 'Implement database models' })).toBeInTheDocument()
   })
 
-  it('displays API error message when connection fails', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network connection failed'))
+  it('deletes a task after confirmation via Axios DELETE', async () => {
+    const user = userEvent.setup()
+
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
+    vi.spyOn(apiClient, 'delete').mockResolvedValue({ data: null })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
+    })
+
+    // Click Delete button
+    await user.click(screen.getByRole('button', { name: /delete task/i }))
+
+    // Confirm button appears
+    const confirmBtn = screen.getByRole('button', { name: /yes, delete/i })
+    expect(confirmBtn).toBeInTheDocument()
+
+    await user.click(confirmBtn)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: 'Design API contract' })).not.toBeInTheDocument()
+    })
+  })
+
+  it('displays API error message when Axios request fails', async () => {
+    vi.spyOn(apiClient, 'get').mockRejectedValue({
+      message: 'Network connection failed',
+      response: {
+        status: 500,
+        data: { detail: 'Internal server error from database' },
+      },
+    })
 
     render(<App />)
 
     await waitFor(() => {
       expect(screen.getByText(/unable to load tasks/i)).toBeInTheDocument()
-      expect(screen.getByText(/network connection failed/i)).toBeInTheDocument()
+      expect(screen.getByText(/internal server error from database/i)).toBeInTheDocument()
     })
+  })
+
+  it('normalizes FastAPI validation array errors properly', () => {
+    const axiosError = {
+      response: {
+        status: 422,
+        data: {
+          detail: [
+            { msg: 'Title must not be empty' },
+            { msg: 'Status must be Todo, In Progress, or Done' },
+          ],
+        },
+      },
+    }
+    const err = normalizeError(axiosError)
+    expect(err.message).toBe('Title must not be empty, Status must be Todo, In Progress, or Done')
+    expect(err.status).toBe(422)
   })
 })

@@ -23,7 +23,7 @@ The application allows users to create tasks, track progress across distinct sta
 
 | Layer | Technology | Details |
 |---|---|---|
-| **Frontend** | React 19 + Vite | JavaScript template (no TypeScript for lean scope), browser `fetch` |
+| **Frontend** | React 19 + Vite + Axios | JavaScript template, Axios HTTP client with baseURL & error normalization |
 | **Styling** | Vanilla CSS + Design Tokens | Custom properties (`:root`), stadium radii, responsive media queries |
 | **Frontend Tests** | Vitest + React Testing Library | DOM testing with `@testing-library/jest-dom` and `jsdom` |
 | **Backend** | Python 3.9+ / FastAPI | Async framework with REST routing and dependency injection |
