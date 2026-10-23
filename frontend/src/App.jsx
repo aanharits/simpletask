@@ -1,113 +1,29 @@
-import { useState, useEffect, useCallback } from 'react'
-import { getTasks, createTask, updateTask, deleteTask } from './api/tasks'
+import { useState } from 'react'
+import useTasks from './hooks/useTasks'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 import './App.css'
 
 export default function App() {
-  const [tasks, setTasks] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
-  const [actionError, setActionError] = useState('')
-  const [actionSuccess, setActionSuccess] = useState('')
-  const [isCreating, setIsCreating] = useState(false)
-  const [updatingTaskId, setUpdatingTaskId] = useState(null)
-  const [deletingTaskId, setDeletingTaskId] = useState(null)
+  const {
+    tasks,
+    loading,
+    loadError,
+    actionError,
+    actionSuccess,
+    isCreating,
+    updatingTaskId,
+    deletingTaskId,
+    stats,
+    createTask,
+    updateTask,
+    deleteTask,
+    retryLoad,
+    clearActionError,
+    clearActionSuccess,
+  } = useTasks()
+
   const [activeFilter, setActiveFilter] = useState('All')
-
-  const loadTasks = useCallback(async () => {
-    setLoading(true)
-    setLoadError('')
-    try {
-      const data = await getTasks()
-      setTasks(data || [])
-    } catch (err) {
-      setLoadError(
-        err.message ||
-          'Could not connect to the backend API. Please make sure the backend is running.'
-      )
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const fetchInitialTasks = async () => {
-      try {
-        const data = await getTasks()
-        setTasks(data || [])
-      } catch (err) {
-        setLoadError(
-          err.message ||
-            'Could not connect to the backend API. Please make sure the backend is running.'
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchInitialTasks()
-  }, [])
-
-  useEffect(() => {
-    if (actionSuccess) {
-      const timer = setTimeout(() => setActionSuccess(''), 4000)
-      return () => clearTimeout(timer)
-    }
-  }, [actionSuccess])
-
-  const handleCreateTask = async (payload) => {
-    setIsCreating(true)
-    setActionError('')
-    try {
-      const newTask = await createTask(payload)
-      // Pertahankan urutan ID ascending agar posisi task tetap stabil di UI.
-      setTasks((prev) => [...prev, newTask].sort((a, b) => a.id - b.id))
-      setActionSuccess(`Task "${newTask.title}" created successfully.`)
-    } catch (err) {
-      setActionError(err.message || 'Failed to create task.')
-      throw err
-    } finally {
-      setIsCreating(false)
-    }
-  }
-
-  const handleUpdateTask = async (taskId, payload) => {
-    setUpdatingTaskId(taskId)
-    setActionError('')
-    try {
-      const updated = await updateTask(taskId, payload)
-      setTasks((prev) =>
-        prev.map((t) => (t.id === taskId ? updated : t))
-      )
-      setActionSuccess(`Task #${taskId} updated successfully.`)
-      return updated
-    } catch (err) {
-      setActionError(err.message || 'Failed to update task.')
-      throw err
-    } finally {
-      setUpdatingTaskId(null)
-    }
-  }
-
-  const handleDeleteTask = async (taskId) => {
-    setDeletingTaskId(taskId)
-    setActionError('')
-    try {
-      await deleteTask(taskId)
-      setTasks((prev) => prev.filter((t) => t.id !== taskId))
-      setActionSuccess(`Task #${taskId} deleted successfully.`)
-    } catch (err) {
-      setActionError(err.message || 'Failed to delete task.')
-      throw err
-    } finally {
-      setDeletingTaskId(null)
-    }
-  }
-
-  const todoCount = tasks.filter((t) => t.status === 'Todo').length
-  const inProgressCount = tasks.filter((t) => t.status === 'In Progress').length
-  const doneCount = tasks.filter((t) => t.status === 'Done').length
 
   return (
     <div className="app-layout">
@@ -134,19 +50,19 @@ export default function App() {
           <div className="stats-row" role="region" aria-label="Task progress summary">
             <div className="stat-card">
               <span className="stat-label">Total Tasks</span>
-              <span className="stat-value">{tasks.length}</span>
+              <span className="stat-value">{stats.total}</span>
             </div>
             <div className="stat-card stat-todo">
               <span className="stat-label">Todo</span>
-              <span className="stat-value">{todoCount}</span>
+              <span className="stat-value">{stats.todo}</span>
             </div>
             <div className="stat-card stat-progress">
               <span className="stat-label">In Progress</span>
-              <span className="stat-value">{inProgressCount}</span>
+              <span className="stat-value">{stats.inProgress}</span>
             </div>
             <div className="stat-card stat-done">
               <span className="stat-label">Done</span>
-              <span className="stat-value">{doneCount}</span>
+              <span className="stat-value">{stats.done}</span>
             </div>
           </div>
         </section>
@@ -158,7 +74,7 @@ export default function App() {
             <button
               type="button"
               className="alert-dismiss"
-              onClick={() => setActionError('')}
+              onClick={clearActionError}
               aria-label="Dismiss error"
             >
               ×
@@ -173,7 +89,7 @@ export default function App() {
             <button
               type="button"
               className="alert-dismiss"
-              onClick={() => setActionSuccess('')}
+              onClick={clearActionSuccess}
               aria-label="Dismiss message"
             >
               ×
@@ -195,7 +111,7 @@ export default function App() {
           </div>
 
           <TaskForm
-            onSubmit={handleCreateTask}
+            onSubmit={createTask}
             isSubmitting={isCreating}
             buttonText="Create Task"
             idPrefix="create-task"
@@ -215,15 +131,15 @@ export default function App() {
               <span className="load-error-icon" aria-hidden="true">!</span>
               <h3>Unable to load tasks</h3>
               <p>{loadError}</p>
-              <button type="button" className="btn btn-primary" onClick={loadTasks}>
+              <button type="button" className="btn btn-primary" onClick={retryLoad}>
                 Retry Connection
               </button>
             </div>
           ) : (
             <TaskList
               tasks={tasks}
-              onUpdate={handleUpdateTask}
-              onDelete={handleDeleteTask}
+              onUpdate={updateTask}
+              onDelete={deleteTask}
               updatingTaskId={updatingTaskId}
               deletingTaskId={deletingTaskId}
               activeFilter={activeFilter}
