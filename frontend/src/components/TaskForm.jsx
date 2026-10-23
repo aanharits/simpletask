@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+// Komponen form input terkontrol untuk membuat task baru atau mengedit task yang ada.
 export default function TaskForm({
   onSubmit,
   initialData = null,
@@ -13,6 +14,7 @@ export default function TaskForm({
   const [status, setStatus] = useState(initialData?.status || 'Todo')
   const [error, setError] = useState('')
 
+  // Memvalidasi batas input form sebelum mengirim payload ke fungsi onSubmit.
   const handleSubmit = async (e) => {
     e.preventDefault()
     const trimmedTitle = title.trim()

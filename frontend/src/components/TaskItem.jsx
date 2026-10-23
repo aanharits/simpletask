@@ -7,10 +7,12 @@ const STATUS_CLASS_MAP = {
   'Todo': 'status-todo',
 }
 
+// Mengonversi status task menjadi nama class CSS untuk styling warna badge.
 function getStatusClass(status) {
   return STATUS_CLASS_MAP[status] || 'status-todo'
 }
 
+// Komponen kartu task yang mendukung tampilan detail, quick selector status, dan inline edit.
 export default function TaskItem({
   task,
   onUpdate,
@@ -22,6 +24,7 @@ export default function TaskItem({
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [itemError, setItemError] = useState('')
 
+  // Memperbarui status task secara instan saat dropdown status diubah pengguna.
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value
     if (newStatus === task.status) return
@@ -34,6 +37,7 @@ export default function TaskItem({
     }
   }
 
+  // Menyimpan perubahan title, description, atau status dari form edit inline.
   const handleEditSubmit = async (formData) => {
     setItemError('')
     try {
@@ -49,6 +53,7 @@ export default function TaskItem({
     }
   }
 
+  // Mengeksekusi penghapusan task setelah konfirmasi pengguna disetujui.
   const handleDelete = async () => {
     setItemError('')
     try {

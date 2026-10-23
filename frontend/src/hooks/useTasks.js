@@ -6,6 +6,7 @@ import {
   deleteTask as apiDeleteTask,
 } from '../api/tasks'
 
+// Custom hook untuk mengelola global state, HTTP request, dan CRUD task.
 export function useTasks() {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -41,6 +42,7 @@ export function useTasks() {
     }
   }, [actionSuccess])
 
+  // Memuat ulang daftar task dari backend saat koneksi gagal.
   const retryLoad = useCallback(async () => {
     setLoading(true)
     setLoadError('')
@@ -57,6 +59,7 @@ export function useTasks() {
     }
   }, [])
 
+  // Membuat task baru, menambahkannya ke state, dan memunculkan feedback sukses.
   const handleCreateTask = useCallback(async (payload) => {
     setIsCreating(true)
     setActionError('')
@@ -74,6 +77,7 @@ export function useTasks() {
     }
   }, [])
 
+  // Memperbarui task di database dan mengupdate state lokal tanpa reload halaman.
   const handleUpdateTask = useCallback(async (taskId, payload) => {
     setUpdatingTaskId(taskId)
     setActionError('')
@@ -92,6 +96,7 @@ export function useTasks() {
     }
   }, [])
 
+  // Menghapus task dari database dan mengeluarkan task tersebut dari state lokal.
   const handleDeleteTask = useCallback(async (taskId) => {
     setDeletingTaskId(taskId)
     setActionError('')

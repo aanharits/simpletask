@@ -1,5 +1,6 @@
 import TaskItem from './TaskItem'
 
+// Komponen daftar tugas yang menampilkan filter pills, grid kartu task, dan empty state.
 export default function TaskList({
   tasks,
   onUpdate,
