@@ -1,12 +1,7 @@
 /**
  * Custom Axios Client Instance
  *
- * Best Practices Implemented:
- * 1. Centralized baseURL configured from Vite environment variables.
- * 2. Sensible request timeout (10s) to prevent hanging requests.
- * 3. Default JSON content-type and accept headers.
- * 4. Request interceptor: Hook for attaching auth tokens / logging in future iterations.
- * 5. Response interceptor: Centralized error handling and FastAPI 422 error normalization.
+ * Configured with baseURL, sensible timeout, and default JSON headers.
  */
 
 import axios from 'axios'
@@ -21,10 +16,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
  * @returns {Error} Normalized Error object with status and data attributes
  */
 export function normalizeError(error) {
-  if (error?.isNormalized) {
-    return error
-  }
-
   let message = 'An unexpected error occurred.'
 
   if (error.response?.data?.detail) {
@@ -44,7 +35,6 @@ export function normalizeError(error) {
   const normalized = new Error(message)
   normalized.status = error.response?.status
   normalized.data = error.response?.data
-  normalized.isNormalized = true
   return normalized
 }
 
@@ -56,28 +46,5 @@ export const apiClient = axios.create({
     Accept: 'application/json',
   },
 })
-
-// Request Interceptor
-apiClient.interceptors.request.use(
-  (config) => {
-    // Pluggable for Authorization header when auth is introduced:
-    // const token = localStorage.getItem('auth_token')
-    // if (token) config.headers.Authorization = `Bearer ${token}`
-    return config
-  },
-  (error) => {
-    return Promise.reject(normalizeError(error))
-  }
-)
-
-// Response Interceptor
-apiClient.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  (error) => {
-    return Promise.reject(normalizeError(error))
-  }
-)
 
 export default apiClient
