@@ -6,15 +6,18 @@ from app.models.task import Task, TaskStatus
 from app.schemas.task import TaskCreate, TaskUpdate
 
 
+# Mengambil seluruh data task dari database dengan urutan ID ascending yang deterministik.
 def get_tasks(session: Session) -> list[Task]:
     statement = select(Task).order_by(Task.id.asc())  # type: ignore
     return list(session.exec(statement).all())
 
 
+# Mengambil data satu task berdasarkan primary key ID.
 def get_task_by_id(session: Session, task_id: int) -> Optional[Task]:
     return session.get(Task, task_id)
 
 
+# Menyimpan task baru ke PostgreSQL dan mengembalikan record yang sudah memiliki ID.
 def create_task(session: Session, task_in: TaskCreate) -> Task:
     status_value = (
         task_in.status.value if isinstance(task_in.status, TaskStatus) else str(task_in.status)
@@ -30,6 +33,7 @@ def create_task(session: Session, task_in: TaskCreate) -> Task:
     return task
 
 
+# Menerapkan update parsial pada field task yang dikirim dan menyimpannya ke database.
 def update_task(session: Session, task: Task, task_in: TaskUpdate) -> Task:
     update_data = task_in.model_dump(exclude_unset=True)
 
@@ -48,6 +52,7 @@ def update_task(session: Session, task: Task, task_in: TaskUpdate) -> Task:
     return task
 
 
+# Menghapus record task dari PostgreSQL dan melakukan commit transaksi.
 def delete_task(session: Session, task: Task) -> None:
     session.delete(task)
     session.commit()

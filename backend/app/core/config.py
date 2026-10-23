@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+# Membaca konfigurasi environment dan file .env secara otomatis via Pydantic Settings.
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(".env", "backend/.env"),
