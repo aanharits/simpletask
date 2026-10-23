@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import TaskForm from './TaskForm'
 
+function getStatusClass(status) {
+  switch (status) {
+    case 'In Progress':
+      return 'status-in-progress'
+    case 'Done':
+      return 'status-done'
+    case 'Todo':
+    default:
+      return 'status-todo'
+  }
+}
+
 export default function TaskItem({
   task,
   onUpdate,
@@ -46,18 +58,6 @@ export default function TaskItem({
     } catch (err) {
       setItemError(err.message || 'Failed to delete task.')
       setShowConfirmDelete(false)
-    }
-  }
-
-  const getStatusClass = (status) => {
-    switch (status) {
-      case 'In Progress':
-        return 'status-in-progress'
-      case 'Done':
-        return 'status-done'
-      case 'Todo':
-      default:
-        return 'status-todo'
     }
   }
 
