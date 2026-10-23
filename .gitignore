@@ -18,6 +18,9 @@ htmlcov/
 node_modules/
 frontend/dist/
 
+# Documentation / Assessment specs
+docs/
+
 # OS / editor
 .DS_Store
 .vscode/
