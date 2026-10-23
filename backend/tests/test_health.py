@@ -1,5 +1,3 @@
-"""Smoke test to verify the backend test runner and FastAPI health endpoint."""
-
 from fastapi.testclient import TestClient
 
 

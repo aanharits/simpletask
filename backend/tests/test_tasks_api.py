@@ -1,5 +1,3 @@
-"""Integration tests for the /tasks API endpoints against PostgreSQL."""
-
 from fastapi.testclient import TestClient
 
 
@@ -148,7 +146,6 @@ class TestDeleteTask:
         assert delete_res.status_code == 204
         assert delete_res.content == b""
 
-        # Verify task no longer exists
         list_res = client.get("/tasks")
         assert all(t["id"] != task_id for t in list_res.json())
 

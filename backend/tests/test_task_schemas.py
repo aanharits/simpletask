@@ -1,5 +1,3 @@
-"""Unit tests for Task API schemas and validators."""
-
 import pytest
 from pydantic import ValidationError
 

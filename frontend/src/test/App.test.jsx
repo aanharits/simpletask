@@ -142,10 +142,8 @@ describe('Task Tracker App Component Tests (with Axios)', () => {
       expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
     })
 
-    // Click Edit button
     await user.click(screen.getByRole('button', { name: /edit task/i }))
 
-    // Form inputs appear inside the item
     const editTitleInput = screen.getByDisplayValue('Design API contract')
     await user.clear(editTitleInput)
     await user.type(editTitleInput, 'Edited Contract Title')
@@ -174,20 +172,17 @@ describe('Task Tracker App Component Tests (with Axios)', () => {
       expect(screen.getByRole('heading', { name: 'Implement database models' })).toBeInTheDocument()
     })
 
-    // Click 'In Progress' filter pill
     const inProgressPill = screen.getByRole('button', { name: /In Progress/i })
     await user.click(inProgressPill)
 
     expect(screen.queryByRole('heading', { name: 'Design API contract' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Implement database models' })).toBeInTheDocument()
 
-    // Click 'Done' filter pill (empty)
     const donePill = screen.getByRole('button', { name: /^Done/i })
     await user.click(donePill)
 
     expect(screen.getByText(/no tasks match the filter/i)).toBeInTheDocument()
 
-    // Click 'Show all tasks'
     await user.click(screen.getByRole('button', { name: /show all tasks/i }))
     expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Implement database models' })).toBeInTheDocument()
@@ -205,10 +200,8 @@ describe('Task Tracker App Component Tests (with Axios)', () => {
       expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
     })
 
-    // Click Delete button
     await user.click(screen.getByRole('button', { name: /delete task/i }))
 
-    // Confirm button appears
     const confirmBtn = screen.getByRole('button', { name: /yes, delete/i })
     expect(confirmBtn).toBeInTheDocument()
 

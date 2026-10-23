@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import TaskForm from './TaskForm'
 
-/**
- * TaskItem component rendering an individual task card.
- * Supports viewing details, quick status switching, inline editing, and deletion with confirmation.
- */
 export default function TaskItem({
   task,
   onUpdate,
@@ -53,7 +49,6 @@ export default function TaskItem({
     }
   }
 
-  // Get status CSS modifier class
   const getStatusClass = (status) => {
     switch (status) {
       case 'In Progress':

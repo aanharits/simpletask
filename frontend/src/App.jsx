@@ -15,7 +15,6 @@ export default function App() {
   const [deletingTaskId, setDeletingTaskId] = useState(null)
   const [activeFilter, setActiveFilter] = useState('All')
 
-  // Load tasks on initial mount
   const loadTasks = useCallback(async () => {
     setLoading(true)
     setLoadError('')
@@ -56,7 +55,6 @@ export default function App() {
     }
   }, [])
 
-  // Clear success notification after 4 seconds
   useEffect(() => {
     if (actionSuccess) {
       const timer = setTimeout(() => setActionSuccess(''), 4000)
@@ -64,13 +62,12 @@ export default function App() {
     }
   }, [actionSuccess])
 
-  // Handle task creation
   const handleCreateTask = async (payload) => {
     setIsCreating(true)
     setActionError('')
     try {
       const newTask = await createTask(payload)
-      // Insert in deterministic ID ascending order
+      // Pertahankan urutan ID ascending agar posisi task tetap stabil di UI.
       setTasks((prev) => [...prev, newTask].sort((a, b) => a.id - b.id))
       setActionSuccess(`Task "${newTask.title}" created successfully.`)
     } catch (err) {
@@ -81,7 +78,6 @@ export default function App() {
     }
   }
 
-  // Handle task update
   const handleUpdateTask = async (taskId, payload) => {
     setUpdatingTaskId(taskId)
     setActionError('')
@@ -100,7 +96,6 @@ export default function App() {
     }
   }
 
-  // Handle task deletion
   const handleDeleteTask = async (taskId) => {
     setDeletingTaskId(taskId)
     setActionError('')
@@ -116,14 +111,12 @@ export default function App() {
     }
   }
 
-  // Quick statistics
   const todoCount = tasks.filter((t) => t.status === 'Todo').length
   const inProgressCount = tasks.filter((t) => t.status === 'In Progress').length
   const doneCount = tasks.filter((t) => t.status === 'Done').length
 
   return (
     <div className="app-layout">
-      {/* Top Floating Header */}
       <header className="app-header">
         <div className="header-pill">
           <div className="brand-badge">
@@ -134,9 +127,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Container */}
       <main className="main-content">
-        {/* Editorial Page Intro */}
         <section className="intro-section">
           <span className="eyebrow-tag">
             <span className="eyebrow-dot" aria-hidden="true">•</span> SIMPLE TASK / PROJECT TRACKER
@@ -146,7 +137,6 @@ export default function App() {
             A full-stack task manager persisting to PostgreSQL. Create, track progress, edit, and organize deliverables without page reload.
           </p>
 
-          {/* Metric stats row */}
           <div className="stats-row" role="region" aria-label="Task progress summary">
             <div className="stat-card">
               <span className="stat-label">Total Tasks</span>
@@ -167,7 +157,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Global Notifications */}
         {actionError && (
           <div className="global-alert alert-error" role="alert">
             <span className="alert-icon" aria-hidden="true">⚠</span>
@@ -198,7 +187,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Create Task Card */}
         <section className="card-surface create-section" aria-labelledby="create-task-heading">
           <div className="section-header">
             <span className="eyebrow-tag">
@@ -220,7 +208,6 @@ export default function App() {
           />
         </section>
 
-        {/* Task List Section */}
         <section className="card-surface list-section" aria-labelledby="task-list-heading">
           <h2 id="task-list-heading" className="sr-only">Tasks</h2>
 
@@ -252,7 +239,6 @@ export default function App() {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="app-footer">
         <div className="footer-content">
           <div className="footer-left">

@@ -1,9 +1,5 @@
 import { useState } from 'react'
 
-/**
- * TaskForm component for creating or editing a task.
- * Enforces title requirement, handles character limits, and provides accessible labels.
- */
 export default function TaskForm({
   onSubmit,
   initialData = null,
@@ -44,7 +40,7 @@ export default function TaskForm({
         status,
       })
 
-      // Reset form on success if it's a create form
+      // Kosongkan form jika berhasil membuat task baru.
       if (!initialData) {
         setTitle('')
         setDescription('')

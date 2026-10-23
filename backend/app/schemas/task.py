@@ -1,23 +1,11 @@
-"""Request/response schemas for the Task API.
-
-These are separate from the database model so that validation rules and
-serialization concerns don't leak into the ORM layer.
-"""
-
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.models.task import TaskStatus
 
-# ---------------------------------------------------------------------------
-# Request schemas
-# ---------------------------------------------------------------------------
-
 
 class TaskCreate(BaseModel):
-    """Schema for POST /tasks."""
-
     title: str = Field(max_length=120)
     description: str = Field(default="", max_length=2000)
     status: TaskStatus = Field(default=TaskStatus.TODO)
@@ -42,13 +30,6 @@ class TaskCreate(BaseModel):
 
 
 class TaskUpdate(BaseModel):
-    """Schema for PUT /tasks/{task_id}.
-
-    All fields are optional so clients can send only what they want to change,
-    but at least one field must be present.  Explicit null is rejected for
-    fields that must remain non-null.
-    """
-
     title: Optional[str] = Field(default=None, max_length=120)
     description: Optional[str] = Field(default=None, max_length=2000)
     status: Optional[TaskStatus] = Field(default=None)
@@ -85,14 +66,7 @@ class TaskUpdate(BaseModel):
         return stripped
 
 
-# ---------------------------------------------------------------------------
-# Response schema
-# ---------------------------------------------------------------------------
-
-
 class TaskRead(BaseModel):
-    """Schema for task responses returned to the client."""
-
     id: int
     title: str
     description: str

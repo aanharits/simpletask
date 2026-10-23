@@ -1,10 +1,9 @@
-// Extend Vitest matchers with jest-dom assertions (e.g. toBeInTheDocument).
-// The vitest import is needed so @testing-library/jest-dom can access expect.
+// Impor matchers jest-dom agar assertions seperti toBeInTheDocument tersedia di Vitest.
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
-// Automatically unmount rendered components after each test
+// Unmount komponen setelah setiap test selesai agar DOM tidak menumpuk antar-test.
 afterEach(() => {
   cleanup()
 })

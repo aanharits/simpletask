@@ -1,9 +1,5 @@
 import TaskItem from './TaskItem'
 
-/**
- * TaskList component managing the presentation of tasks, empty state,
- * and quick filtering by status.
- */
 export default function TaskList({
   tasks,
   onUpdate,
@@ -20,7 +16,6 @@ export default function TaskList({
     return task.status === activeFilter
   })
 
-  // Global empty state (no tasks at all)
   if (tasks.length === 0) {
     return (
       <div className="empty-state-card" role="region" aria-label="No tasks">
@@ -51,7 +46,6 @@ export default function TaskList({
           <span className="tasks-badge">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>
         </div>
 
-        {/* Filter pills */}
         <div className="filter-pill-group" role="group" aria-label="Filter tasks by status">
           {filterOptions.map((filter) => {
             const count = filter === 'All' ? tasks.length : tasks.filter((t) => t.status === filter).length
