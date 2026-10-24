@@ -158,7 +158,7 @@ export default function TaskList({
           </button>
         </div>
       ) : activeFilter === 'All' ? (
-        /* ── Tab Board: 3 Kolom dengan batasan 3 data per kolom + Expand toggle ── */
+        /* Tab Board: 3 Kolom dengan batasan 3 data per kolom + Expand toggle */
         <div key="board-view" className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start animate-fade-in">
           {KANBAN_COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.id)
