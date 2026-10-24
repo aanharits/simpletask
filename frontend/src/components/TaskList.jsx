@@ -101,7 +101,6 @@ export default function TaskList({
     )
   }
 
-  const selectedColConfig = KANBAN_COLUMNS.find((col) => col.id === activeFilter)
 
   return (
     <div className="space-y-5">
@@ -205,12 +204,10 @@ export default function TaskList({
         <TaskGrid
           status={activeFilter}
           tasks={filteredTasks}
-          columnConfig={selectedColConfig}
           onUpdate={onUpdate}
           onDelete={onDelete}
           updatingTaskId={updatingTaskId}
           deletingTaskId={deletingTaskId}
-          onOpenCreate={onOpenCreate}
         />
       )}
     </div>
