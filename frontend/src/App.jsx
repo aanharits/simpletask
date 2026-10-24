@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import useTasks from './hooks/useTasks'
-import TaskModal from './components/TaskModal'
+import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 
-// Komponen halaman utama Simple Task: clean, modern, minimalist dashboard dengan modal create task dan board responsif.
+// Komponen halaman utama Simple Task: clean, modern, minimalist dashboard tanpa sidebar.
 export default function App() {
   const {
     tasks,
@@ -23,9 +23,7 @@ export default function App() {
   } = useTasks()
 
   const [activeFilter, setActiveFilter] = useState('All')
-  // Modal terbuka secara default pada environment test agar elemen input form langsung tersedia di DOM testing,
-  // dan tertutup secara default pada browser untuk pengalaman pengguna yang bersih dan modern.
-  const [isModalOpen, setIsModalOpen] = useState(import.meta.env.MODE === 'test')
+  const [showCreateForm, setShowCreateForm] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
   // Filter tasks berdasarkan activeFilter dan search query jika ada
@@ -38,21 +36,13 @@ export default function App() {
     return true
   })
 
-  // Handler pembuatan task dari modal form
-  const handleCreateTask = async (payload) => {
-    await createTask(payload)
-    if (import.meta.env.MODE !== 'test') {
-      setIsModalOpen(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-[#ECEAE7] p-3 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
       {/* Main Clean Card Frame */}
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-neutral-200/70 overflow-hidden flex flex-col p-5 sm:p-8 min-h-[820px]">
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-neutral-200/70 overflow-hidden flex flex-col p-5 sm:p-8 min-h-[800px]">
         
         {/* Top Navbar Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-neutral-200/70 mb-6 shrink-0">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-neutral-200/70 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-neutral-900 flex items-center justify-center text-white text-sm font-bold shadow-xs">
               ✓
@@ -80,13 +70,13 @@ export default function App() {
               </svg>
             </div>
 
-            {/* Open Create Task Modal Button */}
+            {/* Toggle Create Form Button */}
             <button
               type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-xl shadow-xs hover:shadow-md transition cursor-pointer"
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-xl shadow-xs transition cursor-pointer"
             >
-              <span>+ New Task</span>
+              <span>{showCreateForm ? '− Hide Form' : '+ New Task'}</span>
             </button>
           </div>
         </header>
@@ -94,7 +84,7 @@ export default function App() {
         {/* Global Alert Notifications */}
         {actionError && (
           <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl shadow-2xs shrink-0"
+            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl shadow-2xs"
             role="alert"
           >
             <span>{actionError}</span>
@@ -111,7 +101,7 @@ export default function App() {
 
         {actionSuccess && (
           <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-2xs shrink-0"
+            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-2xs"
             role="status"
           >
             <span>{actionSuccess}</span>
@@ -126,25 +116,50 @@ export default function App() {
           </div>
         )}
 
-        {/* Create Task Modal Dialog (Logic dipecah terpisah di TaskModal.jsx) */}
-        <TaskModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateTask}
-          isSubmitting={isCreating}
-        />
+        {/* Create Task Card */}
+        {showCreateForm && (
+          <section
+            className="mb-6 bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs"
+            aria-labelledby="create-task-heading"
+          >
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
+              <div>
+                <h2 id="create-task-heading" className="text-sm font-bold text-neutral-900">
+                  Create a Task
+                </h2>
+                <p className="text-xs text-neutral-500">
+                  Add a new task item with title, optional description, and status.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateForm(false)}
+                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
 
-        {/* Main Board Section with full vertical flex fulfillment */}
-        <section className="flex-1 flex flex-col min-h-[500px]" aria-labelledby="task-list-heading">
+            <TaskForm
+              onSubmit={createTask}
+              isSubmitting={isCreating}
+              buttonText="Create Task"
+              idPrefix="create-task"
+            />
+          </section>
+        )}
+
+        {/* Main Board Section */}
+        <section className="flex-1" aria-labelledby="task-list-heading">
           <h2 id="task-list-heading" className="sr-only">Tasks</h2>
 
           {loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-20 text-center" role="status" aria-live="polite">
+            <div className="flex flex-col items-center justify-center py-20 text-center" role="status" aria-live="polite">
               <div className="w-8 h-8 border-3 border-neutral-300 border-t-neutral-900 rounded-full animate-spin mb-3" aria-hidden="true" />
               <p className="text-xs font-medium text-neutral-500">Loading tasks from database...</p>
             </div>
           ) : loadError ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-14 px-4 text-center bg-red-50/50 border border-red-200 rounded-2xl my-auto" role="alert">
+            <div className="flex flex-col items-center justify-center py-14 px-4 text-center bg-red-50/50 border border-red-200 rounded-2xl" role="alert">
               <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 font-bold flex items-center justify-center mb-2">!</div>
               <h3 className="text-sm font-bold text-red-900 mb-1">Unable to load tasks</h3>
               <p className="text-xs text-red-600 max-w-md mb-4">{loadError}</p>
@@ -165,13 +180,13 @@ export default function App() {
               deletingTaskId={deletingTaskId}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
-              onOpenCreate={() => setIsModalOpen(true)}
+              onOpenCreate={() => setShowCreateForm(true)}
             />
           )}
         </section>
 
         {/* Minimal Footer */}
-        <footer className="pt-6 mt-8 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-400 shrink-0">
+        <footer className="pt-6 mt-8 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-400">
           <span>Simple Task • Technical Test Intern Software Engineer</span>
           <span>Farhan Harits Prakoso</span>
         </footer>

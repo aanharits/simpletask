@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import TaskItem from './TaskItem'
+import KanbanColumn from './KanbanColumn'
+import TaskGrid from './TaskGrid'
 
 const KANBAN_COLUMNS = [
   {
@@ -47,7 +48,7 @@ const KANBAN_COLUMNS = [
   },
 ]
 
-// Komponen board layout yang terinspirasi dari Codomo: columns, dropzones, view tabs, dan empty states.
+// Komponen board layout utama: Board view dengan batasan 3 data & expand, serta status view dengan responsif grid.
 export default function TaskList({
   tasks,
   onUpdate,
@@ -66,63 +67,45 @@ export default function TaskList({
     return task.status === activeFilter
   })
 
-  // Tampilkan empty state global jika belum ada data task (centered, modern, dan eye-catching)
+  // Tampilkan empty state global jika belum ada data task
   if (tasks.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col items-center justify-center min-h-[460px] w-full py-12 px-4"
+        className="flex flex-col items-center justify-center text-center p-12 bg-[#F7F6F4] border border-dashed border-neutral-300 rounded-3xl"
         role="region"
         aria-label="No tasks"
       >
-        <div className="max-w-md w-full bg-[#FAF9F7] border border-neutral-200/90 rounded-[28px] p-8 sm:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center">
-          {/* Eye-catching icon badge */}
-          <div className="w-16 h-16 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex items-center justify-center text-neutral-800 mb-4" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-              <path d="M9 16l2 2 4-4" />
-            </svg>
-          </div>
-
-          <h3 className="text-lg font-bold text-neutral-900 tracking-tight mb-2">No tasks recorded yet</h3>
-          <p className="text-xs sm:text-sm text-neutral-500 max-w-xs leading-relaxed mb-6">
-            Stay organized and keep deliverables on track. Create your first task to start managing your workflow.
-          </p>
-
-          {onOpenCreate && (
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-black rounded-xl shadow-xs hover:shadow-md transition cursor-pointer"
-              onClick={onOpenCreate}
-            >
-              <span className="text-base leading-none">+</span>
-              <span>Add First Task</span>
-            </button>
-          )}
-
-          {/* Workflow preview pills (fulfills visual hierarchy) */}
-          <div className="flex items-center gap-2 pt-6 mt-6 border-t border-neutral-200/60 text-[11px] font-medium text-neutral-400">
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-neutral-400" /> Todo</span>
-            <span className="text-neutral-300">→</span>
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> In Progress</span>
-            <span className="text-neutral-300">→</span>
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Done</span>
-          </div>
+        <div className="w-12 h-12 rounded-2xl bg-white border border-neutral-200 text-neutral-400 flex items-center justify-center mb-3 shadow-2xs">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
         </div>
+        <h3 className="text-base font-bold text-neutral-900 mb-1">No tasks recorded yet</h3>
+        <p className="text-xs text-neutral-500 max-w-sm mb-4 leading-relaxed">
+          Get started by filling out the form to add your first task.
+          Your tasks are stored persistently in PostgreSQL.
+        </p>
+        {onOpenCreate && (
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-neutral-900 hover:bg-black rounded-xl shadow-xs transition cursor-pointer"
+            onClick={onOpenCreate}
+          >
+            <span>+ Add First Task</span>
+          </button>
+        )}
       </div>
     )
   }
 
-  // Menentukan kolom yang tampil berdasarkan filter yang aktif
-  const visibleColumns = activeFilter === 'All'
-    ? KANBAN_COLUMNS
-    : KANBAN_COLUMNS.filter((col) => col.id === activeFilter)
+  const selectedColConfig = KANBAN_COLUMNS.find((col) => col.id === activeFilter)
 
   return (
     <div className="space-y-5">
-      {/* View Switcher Tabs & Filter Buttons (matching Codomo Board tab bar) */}
+      {/* View Switcher Tabs & Filter Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div
           className="inline-flex items-center p-1 bg-[#EBE9E6] rounded-xl border border-neutral-200/60 shadow-2xs overflow-x-auto"
@@ -161,7 +144,7 @@ export default function TaskList({
         </div>
       </div>
 
-      {/* Filter Empty State jika filter spesifik tidak memiliki task */}
+      {/* Tampilan jika filter spesifik tidak memiliki task yang cocok */}
       {filteredTasks.length === 0 ? (
         <div className="text-center py-14 px-4 bg-[#FAF9F7] border border-neutral-200/70 rounded-3xl">
           <p className="text-sm text-neutral-600 mb-3">
@@ -175,27 +158,25 @@ export default function TaskList({
             Show all tasks
           </button>
         </div>
-      ) : (
-        /* Board Columns matching Codomo columns in screenshot */
-        <div
-          className={`grid gap-4 items-start ${
-            visibleColumns.length === 1
-              ? 'grid-cols-1 max-w-md'
-              : 'grid-cols-1 md:grid-cols-3'
-          }`}
-        >
-          {visibleColumns.map((col) => {
+      ) : activeFilter === 'All' ? (
+        /* ── Tab Board: 3 Kolom dengan batasan 3 data per kolom + Expand toggle ── */
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+          {KANBAN_COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.id)
             const isOver = dragOverCol === col.id
 
             return (
-              <div
+              <KanbanColumn
                 key={col.id}
-                className={`flex flex-col bg-[#F3F2F0] border rounded-2xl p-3 transition-all duration-150 ${
-                  isOver
-                    ? 'border-neutral-400 bg-neutral-200/60 ring-2 ring-neutral-900/10'
-                    : 'border-neutral-200/70'
-                }`}
+                col={col}
+                tasks={columnTasks}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                updatingTaskId={updatingTaskId}
+                deletingTaskId={deletingTaskId}
+                isOver={isOver}
+                initialLimit={3}
+                onOpenCreate={onOpenCreate}
                 onDragOver={(e) => {
                   e.preventDefault()
                   e.dataTransfer.dropEffect = 'move'
@@ -215,53 +196,22 @@ export default function TaskList({
                     onUpdate(taskId, { status: col.id })
                   }
                 }}
-              >
-                {/* Column Header: Icon + Title + (+) quick add button */}
-                <div className="flex items-center justify-between px-1 pb-3 mb-2 border-b border-neutral-200/60">
-                  <div className="flex items-center gap-2">
-                    {col.icon}
-                    <h3 className="text-xs font-bold text-neutral-800">
-                      {col.title}
-                    </h3>
-                    <span className="text-[11px] font-semibold text-neutral-400">
-                      {columnTasks.length}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="w-5 h-5 rounded-full border border-neutral-300 hover:border-neutral-900 flex items-center justify-center text-xs text-neutral-500 hover:text-neutral-900 transition cursor-pointer"
-                    onClick={onOpenCreate}
-                    title={`Add new task to ${col.title}`}
-                  >
-                    +
-                  </button>
-                </div>
-
-                {/* Column Task Cards */}
-                {columnTasks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-10 px-3 border border-dashed border-neutral-300 rounded-xl text-center">
-                    <p className="text-xs font-medium text-neutral-400 mb-0.5">{col.emptyText}</p>
-                    <span className="text-[10px] text-neutral-400">Drag a task here</span>
-                  </div>
-                ) : (
-                  <ul className="space-y-3" aria-label={`${col.title} tasks`}>
-                    {columnTasks.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onUpdate={onUpdate}
-                        onDelete={onDelete}
-                        isUpdating={updatingTaskId === task.id}
-                        isDeleting={deletingTaskId === task.id}
-                      />
-                    ))}
-                  </ul>
-                )}
-              </div>
+              />
             )
           })}
         </div>
+      ) : (
+        /* ── Tab Status (Todo / In Progress / Done): Tampilan GRID Multi-Kolom ── */
+        <TaskGrid
+          status={activeFilter}
+          tasks={filteredTasks}
+          columnConfig={selectedColConfig}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+          updatingTaskId={updatingTaskId}
+          deletingTaskId={deletingTaskId}
+          onOpenCreate={onOpenCreate}
+        />
       )}
     </div>
   )
