@@ -1,27 +1,34 @@
 import { useState } from 'react'
 import TaskForm from './TaskForm'
 
-const STATUS_DOT = {
-  'Todo':        'bg-taupe',
-  'In Progress': 'bg-light-orange',
-  'Done':        'bg-[#2E7D32]',
+const CARD_STYLES = {
+  'Todo': {
+    container: 'bg-[#F5F2ED] border-[#E3DED7] hover:border-[#D0CAC0]',
+    badge: 'bg-status-todo-bg text-status-todo-text border-status-todo-border',
+    iconBox: 'border-slate-custom/40 bg-white/80 text-slate-custom',
+    checkIcon: null,
+  },
+  'In Progress': {
+    container: 'bg-[#FFF2EA] border-[#FCD7C0] hover:border-[#F5BCA0]',
+    badge: 'bg-status-prog-bg text-status-prog-text border-status-prog-border',
+    iconBox: 'border-light-orange bg-white/80 text-light-orange',
+    checkIcon: '⚡',
+  },
+  'Done': {
+    container: 'bg-[#EEF7F0] border-[#CDE5D2] hover:border-[#B4D7BC]',
+    badge: 'bg-status-done-bg text-status-done-text border-status-done-border',
+    iconBox: 'border-[#2E7D32] bg-[#2E7D32] text-white',
+    checkIcon: '✓',
+  },
 }
 
-const STATUS_BADGE = {
-  'Todo':        'bg-status-todo-bg text-status-todo-text border border-status-todo-border',
-  'In Progress': 'bg-status-prog-bg text-status-prog-text border border-status-prog-border',
-  'Done':        'bg-status-done-bg text-status-done-text border border-status-done-border',
-}
-
-// Komponen baris task minimalist dengan inline edit dan konfirmasi hapus dua langkah.
+// Komponen kartu task dengan modern minimalist card layout terinspirasi dari referensi desain.
 export default function TaskItem({
   task,
   onUpdate,
   onDelete,
   isUpdating = false,
   isDeleting = false,
-  isFirst = false,
-  isLast = false,
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -31,6 +38,7 @@ export default function TaskItem({
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value
     if (newStatus === task.status) return
+
     setItemError('')
     try {
       await onUpdate(task.id, { status: newStatus })
@@ -39,7 +47,7 @@ export default function TaskItem({
     }
   }
 
-  // Menyimpan perubahan dari form edit inline.
+  // Menyimpan perubahan title, description, atau status dari form edit inline.
   const handleEditSubmit = async (formData) => {
     setItemError('')
     try {
@@ -55,7 +63,7 @@ export default function TaskItem({
     }
   }
 
-  // Mengeksekusi penghapusan task setelah konfirmasi.
+  // Mengeksekusi penghapusan task dengan konfirmasi keamanan dua langkah.
   const handleDelete = async () => {
     setItemError('')
     try {
@@ -66,16 +74,13 @@ export default function TaskItem({
     }
   }
 
-  // Mode edit — tampilkan form inline dalam baris.
   if (isEditing) {
     return (
-      <li
-        className={`bg-canvas/60 border border-border-custom px-5 py-5 ${isFirst ? 'rounded-t-xl' : ''} ${isLast ? 'rounded-b-xl' : ''}`}
-        data-task-id={task.id}
-      >
-        <div className="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-wider text-granite">
-          <span className="text-light-orange text-sm leading-none" aria-hidden="true">•</span>
-          Editing Task #{task.id}
+      <li className="bg-lifted border-[1.5px] border-ink rounded-2xl p-5 sm:p-6 flex flex-col gap-4 shadow-[0_4px_24px_rgba(20,20,19,0.04)]">
+        <div className="pb-3 border-b border-border-custom">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-granite">
+            <span className="text-light-orange text-base leading-none" aria-hidden="true">•</span> EDITING TASK #{task.id}
+          </span>
         </div>
         <TaskForm
           initialData={task}
@@ -92,102 +97,55 @@ export default function TaskItem({
     )
   }
 
-  const dotStyle = STATUS_DOT[task.status] || STATUS_DOT['Todo']
-  const badgeStyle = STATUS_BADGE[task.status] || STATUS_BADGE['Todo']
+  const cardConfig = CARD_STYLES[task.status] || CARD_STYLES['Todo']
 
   return (
     <li
-      className={`
-        group relative flex items-start gap-4 px-5 py-4 bg-lifted
-        border-b border-border-custom/60 last:border-b-0
-        hover:bg-canvas/70 transition-colors
-        ${isFirst ? 'rounded-t-xl border-t border-border-custom/60' : ''}
-        ${isLast ? 'rounded-b-xl' : ''}
-      `}
+      className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 transition-all duration-200 shadow-[0_2px_8px_rgba(20,20,19,0.03)] hover:shadow-md ${cardConfig.container}`}
       data-task-id={task.id}
     >
-      {/* Status indicator circle */}
-      <div className="flex items-center pt-0.5 shrink-0">
-        <label htmlFor={`quick-status-${task.id}`} className="sr-only">
-          Change status for task {task.title}
-        </label>
-        <div className="relative">
-          <div
-            className={`w-4 h-4 rounded-full border-2 border-border-custom flex items-center justify-center cursor-pointer transition-all ${
-              task.status === 'Done' ? 'bg-status-done-bg border-[#2E7D32]' : 'bg-white hover:border-taupe'
-            }`}
-            aria-hidden="true"
+      {itemError && (
+        <div className="flex items-center justify-between px-3 py-2 text-xs font-medium bg-error-bg text-error-text border border-error-border rounded-lg" role="alert">
+          <span>{itemError}</span>
+          <button
+            type="button"
+            className="text-lg leading-none cursor-pointer opacity-70 hover:opacity-100 ml-2"
+            onClick={() => setItemError('')}
+            aria-label="Dismiss error"
           >
-            {task.status === 'Done' && (
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="3">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            )}
-          </div>
-          <select
-            id={`quick-status-${task.id}`}
-            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            value={task.status}
-            disabled={isUpdating || isDeleting}
-            onChange={handleStatusChange}
-            title="Quickly change task status"
-          >
-            <option value="Todo">Todo</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
+            ×
+          </button>
         </div>
-      </div>
+      )}
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {itemError && (
-          <div className="flex items-center justify-between mb-2 px-2.5 py-1.5 rounded-lg text-xs bg-error-bg text-error-text border border-error-border" role="alert">
-            <span>{itemError}</span>
-            <button
-              type="button"
-              className="ml-2 opacity-70 hover:opacity-100 cursor-pointer"
-              onClick={() => setItemError('')}
-              aria-label="Dismiss error"
+      <div>
+        {/* Card Header: Checkbox indicator, Title, and Actions */}
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+            {/* Soft Checkbox Icon */}
+            <div
+              className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold transition-colors ${cardConfig.iconBox}`}
+              aria-hidden="true"
             >
-              ×
-            </button>
-          </div>
-        )}
+              {cardConfig.checkIcon}
+            </div>
 
-        {/* Title row */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
             <h3
-              className={`text-sm font-semibold leading-snug tracking-tight break-words ${
+              className={`text-base font-bold tracking-tight break-words ${
                 task.status === 'Done' ? 'text-slate-custom line-through' : 'text-ink'
               }`}
             >
               {task.title}
             </h3>
-
-            {task.description && (
-              <p className="mt-0.5 text-xs text-granite leading-relaxed line-clamp-2 whitespace-pre-wrap">
-                {task.description}
-              </p>
-            )}
           </div>
 
-          {/* Actions — revealed on hover, always visible on mobile */}
-          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-            {/* Status badge */}
-            <span className={`hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeStyle}`}>
-              <span className={`w-1 h-1 rounded-full ${dotStyle}`} aria-hidden="true" />
-              {task.status}
-            </span>
-
-            <span className="text-border-custom text-xs hidden sm:block">|</span>
-
+          {/* Action buttons */}
+          <div className="flex items-center gap-1.5 shrink-0">
             {!showConfirmDelete ? (
               <>
                 <button
                   type="button"
-                  className="px-2.5 py-1 rounded-md text-[11px] font-semibold text-granite hover:text-ink hover:bg-canvas transition cursor-pointer disabled:opacity-50"
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-ink border border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
                   onClick={() => setIsEditing(true)}
                   disabled={isUpdating || isDeleting}
                   aria-label={`Edit task ${task.title}`}
@@ -196,7 +154,7 @@ export default function TaskItem({
                 </button>
                 <button
                   type="button"
-                  className="px-2.5 py-1 rounded-md text-[11px] font-semibold text-error-text/70 hover:text-error-text hover:bg-error-bg transition cursor-pointer disabled:opacity-50"
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-error-text border border-error-border hover:border-error-text hover:bg-error-bg active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
                   onClick={() => setShowConfirmDelete(true)}
                   disabled={isUpdating || isDeleting}
                   aria-label={`Delete task ${task.title}`}
@@ -205,11 +163,11 @@ export default function TaskItem({
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-1" role="group" aria-label="Confirm deletion">
-                <span className="text-[11px] font-semibold text-error-text">Delete?</span>
+              <div className="flex items-center gap-1.5" role="group" aria-label="Confirm deletion">
+                <span className="text-xs font-semibold text-error-text">Delete?</span>
                 <button
                   type="button"
-                  className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-error-text text-white hover:opacity-90 transition cursor-pointer disabled:opacity-50"
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-error-text text-white hover:opacity-90 active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
                   onClick={handleDelete}
                   disabled={isDeleting}
                 >
@@ -217,7 +175,7 @@ export default function TaskItem({
                 </button>
                 <button
                   type="button"
-                  className="px-2.5 py-1 rounded-md text-[11px] font-semibold text-granite hover:text-ink hover:bg-canvas transition cursor-pointer disabled:opacity-50"
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white text-ink border border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
                   onClick={() => setShowConfirmDelete(false)}
                   disabled={isDeleting}
                 >
@@ -228,14 +186,38 @@ export default function TaskItem({
           </div>
         </div>
 
-        {/* Meta row */}
-        <div className="flex items-center gap-3 mt-1.5">
-          {/* Status badge — mobile (always visible) */}
-          <span className={`sm:hidden inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeStyle}`}>
-            <span className={`w-1 h-1 rounded-full ${dotStyle}`} aria-hidden="true" />
-            {task.status}
-          </span>
-          <span className="text-[11px] text-taupe font-mono">#{task.id}</span>
+        {/* Task Description */}
+        {task.description ? (
+          <p className="text-xs sm:text-sm text-granite leading-relaxed whitespace-pre-wrap break-words pl-[30px] line-clamp-3">
+            {task.description}
+          </p>
+        ) : (
+          <p className="text-xs italic text-slate-custom opacity-70 pl-[30px]">
+            No description provided.
+          </p>
+        )}
+      </div>
+
+      {/* Card Footer: Task ID and Quick Status Selector */}
+      <div className="flex items-center justify-between pt-3 border-t border-black/5 flex-wrap gap-2 text-xs">
+        <span className="font-mono text-slate-custom text-[11px]">ID #{task.id}</span>
+
+        <div className="flex items-center gap-2">
+          <label htmlFor={`quick-status-${task.id}`} className="sr-only">
+            Change status for task {task.title}
+          </label>
+          <select
+            id={`quick-status-${task.id}`}
+            className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/95 hover:bg-white border border-border-custom text-charcoal hover:border-ink hover:text-ink focus:outline-none focus:border-ink transition cursor-pointer disabled:opacity-60 shadow-2xs"
+            value={task.status}
+            disabled={isUpdating || isDeleting}
+            onChange={handleStatusChange}
+            title="Quickly change task status"
+          >
+            <option value="Todo">Todo</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
         </div>
       </div>
     </li>

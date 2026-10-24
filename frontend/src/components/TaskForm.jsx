@@ -54,28 +54,25 @@ export default function TaskForm({
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
       {error && (
         <div
-          className="flex items-center gap-2 px-3.5 py-2.5 text-sm bg-error-bg text-error-text border border-error-border rounded-lg"
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-error-bg text-error-text border border-error-border rounded-[10px]"
           role="alert"
         >
-          <span className="text-signal-orange" aria-hidden="true">•</span>
-          <span className="font-medium">{error}</span>
+          <span className="text-signal-orange text-lg leading-none" aria-hidden="true">•</span>
+          <span>{error}</span>
         </div>
       )}
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <label htmlFor={`${idPrefix}-title`} className="text-xs font-semibold uppercase tracking-wider text-granite">
-            Title <span className="text-signal-orange" aria-hidden="true">*</span>
-          </label>
-          <span className="text-[10px] font-mono text-taupe">{title.length}/120</span>
-        </div>
+        <label htmlFor={`${idPrefix}-title`} className="text-sm font-semibold text-charcoal flex items-center gap-1">
+          Title <span className="text-signal-orange" aria-hidden="true">*</span>
+        </label>
         <input
           id={`${idPrefix}-title`}
           type="text"
-          className="w-full bg-white border border-taupe rounded-lg px-3.5 py-2.5 text-sm text-ink placeholder:text-taupe focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10 transition disabled:bg-canvas/50"
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition disabled:bg-canvas/50"
           placeholder="e.g. Design API specification"
           value={title}
           maxLength={120}
@@ -86,34 +83,33 @@ export default function TaskForm({
           }}
           required
         />
+        <span className="text-[11px] text-slate-custom self-end">{title.length}/120</span>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <label htmlFor={`${idPrefix}-description`} className="text-xs font-semibold uppercase tracking-wider text-granite">
-            Description <span className="text-xs font-normal normal-case tracking-normal text-taupe">(optional)</span>
-          </label>
-          <span className="text-[10px] font-mono text-taupe">{description.length}/2000</span>
-        </div>
+        <label htmlFor={`${idPrefix}-description`} className="text-sm font-semibold text-charcoal flex items-center gap-1">
+          Description <span className="text-xs font-normal text-slate-custom">(optional)</span>
+        </label>
         <textarea
           id={`${idPrefix}-description`}
-          className="w-full bg-white border border-taupe rounded-lg px-3.5 py-2.5 text-sm text-ink placeholder:text-taupe focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10 transition resize-y min-h-[72px] disabled:bg-canvas/50"
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition resize-y min-h-[80px] disabled:bg-canvas/50"
           placeholder="Add any extra context or requirements..."
           value={description}
           maxLength={2000}
-          rows={2}
+          rows={3}
           disabled={isSubmitting}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <span className="text-[11px] text-slate-custom self-end">{description.length}/2000</span>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={`${idPrefix}-status`} className="text-xs font-semibold uppercase tracking-wider text-granite">
+        <label htmlFor={`${idPrefix}-status`} className="text-sm font-semibold text-charcoal">
           Status
         </label>
         <select
           id={`${idPrefix}-status`}
-          className="w-full bg-white border border-taupe rounded-lg px-3.5 py-2.5 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10 transition disabled:bg-canvas/50 cursor-pointer"
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition disabled:bg-canvas/50 cursor-pointer"
           value={status}
           disabled={isSubmitting}
           onChange={(e) => setStatus(e.target.value)}
@@ -124,10 +120,10 @@ export default function TaskForm({
         </select>
       </div>
 
-      <div className="flex items-center gap-2.5 pt-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
         <button
           type="submit"
-          className="inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold bg-ink text-canvas border border-ink hover:bg-charcoal active:scale-[0.98] transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-full text-[15px] font-semibold bg-ink text-canvas border-[1.5px] border-ink hover:bg-charcoal hover:border-charcoal active:scale-[0.98] transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[42px]"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : buttonText}
@@ -135,7 +131,7 @@ export default function TaskForm({
         {onCancel && (
           <button
             type="button"
-            className="inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold text-granite bg-white border border-taupe hover:border-ink hover:text-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-full text-[15px] font-semibold bg-white text-ink border-[1.5px] border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60 min-h-[42px]"
             onClick={onCancel}
             disabled={isSubmitting}
           >
