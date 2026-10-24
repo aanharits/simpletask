@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useTasks from './hooks/useTasks'
+import useToast from './hooks/useToast'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import ToastContainer from './components/Toast'
 
 // Komponen halaman utama Simple Task: clean, modern, minimalist dashboard tanpa sidebar.
 export default function App() {
@@ -22,9 +24,26 @@ export default function App() {
     clearActionSuccess,
   } = useTasks()
 
+  const { toasts, showSuccess, showError, removeToast } = useToast()
+
   const [activeFilter, setActiveFilter] = useState('All')
   const [showCreateForm, setShowCreateForm] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Sinkronkan notifikasi sukses atau error ke modul toaster
+  useEffect(() => {
+    if (actionSuccess) {
+      showSuccess(actionSuccess)
+      clearActionSuccess()
+    }
+  }, [actionSuccess, showSuccess, clearActionSuccess])
+
+  useEffect(() => {
+    if (actionError) {
+      showError(actionError)
+      clearActionError()
+    }
+  }, [actionError, showError, clearActionError])
 
   // Jika belum ada data sama sekali, form wajib selalu terbuka dan tidak bisa di-hide.
   const hasTasks = tasks.length > 0
@@ -51,6 +70,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#ECEAE7] p-3 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
+      {/* Floating Toaster Container */}
+      <ToastContainer toasts={toasts} onDismiss={removeToast} />
+
       {/* Main Clean Card Frame */}
       <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-neutral-200/70 overflow-hidden flex flex-col p-5 sm:p-8 min-h-[800px]">
         
@@ -105,41 +127,6 @@ export default function App() {
             )}
           </div>
         </header>
-
-        {/* Global Alert Notifications with slide-down animation */}
-        {actionError && (
-          <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl shadow-2xs animate-slide-down"
-            role="alert"
-          >
-            <span>{actionError}</span>
-            <button
-              type="button"
-              className="text-red-500 hover:text-red-700 font-bold ml-2 text-sm hover:scale-110 active:scale-95 transition-transform duration-150 cursor-pointer"
-              onClick={clearActionError}
-              aria-label="Dismiss error"
-            >
-              ×
-            </button>
-          </div>
-        )}
-
-        {actionSuccess && (
-          <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-2xs animate-slide-down"
-            role="status"
-          >
-            <span>{actionSuccess}</span>
-            <button
-              type="button"
-              className="text-emerald-500 hover:text-emerald-700 font-bold ml-2 text-sm hover:scale-110 active:scale-95 transition-transform duration-150 cursor-pointer"
-              onClick={clearActionSuccess}
-              aria-label="Dismiss message"
-            >
-              ×
-            </button>
-          </div>
-        )}
 
         {/* Create Task Card with smooth accordion roll-down & roll-up animation */}
         <div className={`form-accordion ${isFormOpen ? 'is-open' : ''}`}>
