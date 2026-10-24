@@ -25,10 +25,10 @@ export default function KanbanColumn({
 
   return (
     <div
-      className={`flex flex-col bg-[#F3F2F0] border rounded-2xl p-3 transition-all duration-150 ${
+      className={`flex flex-col bg-[#F3F2F0] border rounded-2xl p-3 transition-all duration-200 ease-out ${
         isOver
-          ? 'border-neutral-400 bg-neutral-200/60 ring-2 ring-neutral-900/10'
-          : 'border-neutral-200/70'
+          ? 'border-neutral-900 bg-neutral-200/80 ring-2 ring-neutral-900/15 scale-[1.01]'
+          : 'border-neutral-200/70 hover:border-neutral-300'
       }`}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -49,7 +49,7 @@ export default function KanbanColumn({
         {onOpenCreate && (
           <button
             type="button"
-            className="w-5 h-5 rounded-full border border-neutral-300 hover:border-neutral-900 flex items-center justify-center text-xs text-neutral-500 hover:text-neutral-900 transition cursor-pointer"
+            className="w-5 h-5 rounded-full border border-neutral-300 hover:border-neutral-900 flex items-center justify-center text-xs text-neutral-500 hover:text-neutral-900 hover:scale-110 active:scale-95 transition-all duration-150 cursor-pointer"
             onClick={onOpenCreate}
             title={`Add new task to ${col.title}`}
           >
@@ -84,7 +84,7 @@ export default function KanbanColumn({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="w-full py-2 px-3 text-xs font-semibold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 border border-neutral-200/90 rounded-xl shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full py-2 px-3 text-xs font-semibold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-50 active:scale-[0.98] border border-neutral-200/90 hover:border-neutral-300 rounded-xl shadow-2xs transition-all duration-150 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>{isExpanded ? '− Show less' : `+ Show ${hiddenCount} more`}</span>
               <span className="text-[10px] text-neutral-400">({tasks.length} total)</span>

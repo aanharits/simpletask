@@ -87,7 +87,7 @@ export default function TaskItem({
 
   if (isEditing) {
     return (
-      <li className="bg-white rounded-2xl border border-neutral-300 p-4 shadow-sm">
+      <li className="bg-white rounded-2xl border border-neutral-300 p-4 shadow-sm animate-pop-in">
         <div className="flex items-center gap-1.5 mb-3 text-xs font-semibold text-neutral-700 uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" aria-hidden="true" />
           <span>Editing Task #{task.id}</span>
@@ -111,17 +111,17 @@ export default function TaskItem({
 
   return (
     <li
-      className="bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 transition-all cursor-grab active:cursor-grabbing flex flex-col justify-between"
+      className="bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing flex flex-col justify-between animate-fade-in"
       data-task-id={task.id}
       draggable={!showConfirmDelete}
       onDragStart={handleDragStart}
     >
       {itemError && (
-        <div className="flex items-center justify-between p-2 mb-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl" role="alert">
+        <div className="flex items-center justify-between p-2 mb-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl animate-slide-down" role="alert">
           <span>{itemError}</span>
           <button
             type="button"
-            className="text-red-500 hover:text-red-700 font-bold ml-2 cursor-pointer"
+            className="text-red-500 hover:text-red-700 font-bold ml-2 hover:scale-110 active:scale-95 transition-transform duration-150 cursor-pointer"
             onClick={() => setItemError('')}
             aria-label="Dismiss error"
           >
@@ -159,7 +159,7 @@ export default function TaskItem({
             <span>ID #{task.id}</span>
           </div>
 
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-full border ${prog.badge}`}>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-full border transition-colors duration-150 ${prog.badge}`}>
             <span aria-hidden="true">{prog.icon}</span>
             <span>{prog.label}</span>
           </span>
@@ -178,7 +178,7 @@ export default function TaskItem({
             </label>
             <select
               id={`quick-status-${task.id}`}
-              className="text-[11px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-neutral-900 cursor-pointer disabled:opacity-50"
+              className="text-[11px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-150 cursor-pointer disabled:opacity-50"
               value={selectedStatus}
               disabled={isUpdating || isDeleting}
               onChange={handleStatusChange}
@@ -194,7 +194,7 @@ export default function TaskItem({
             <>
               <button
                 type="button"
-                className="px-2 py-1 text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                className="px-2 py-1 text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 active:scale-95 border border-neutral-200 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={() => setIsEditing(true)}
                 disabled={isUpdating || isDeleting}
                 aria-label={`Edit task ${task.title}`}
@@ -203,7 +203,7 @@ export default function TaskItem({
               </button>
               <button
                 type="button"
-                className="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-700 bg-red-50/60 hover:bg-red-50 border border-red-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                className="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-700 bg-red-50/60 hover:bg-red-50 active:scale-95 border border-red-200 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={() => setShowConfirmDelete(true)}
                 disabled={isUpdating || isDeleting}
                 aria-label={`Delete task ${task.title}`}
@@ -212,11 +212,11 @@ export default function TaskItem({
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-1" role="group" aria-label="Confirm deletion">
+            <div className="flex items-center gap-1 animate-pop-in" role="group" aria-label="Confirm deletion">
               <span className="text-[11px] font-semibold text-red-600">Delete?</span>
               <button
                 type="button"
-                className="px-2 py-0.5 text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer disabled:opacity-50"
+                className="px-2 py-0.5 text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 active:scale-95 rounded-lg shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={handleDelete}
                 disabled={isDeleting}
               >
@@ -224,7 +224,7 @@ export default function TaskItem({
               </button>
               <button
                 type="button"
-                className="px-2 py-0.5 text-[11px] font-medium text-neutral-600 hover:text-neutral-800 bg-white border border-neutral-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                className="px-2 py-0.5 text-[11px] font-medium text-neutral-600 hover:text-neutral-800 bg-white border border-neutral-200 active:scale-95 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={() => setShowConfirmDelete(false)}
                 disabled={isDeleting}
               >

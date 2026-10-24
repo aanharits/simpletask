@@ -91,7 +91,7 @@ export default function TaskList({
         {onOpenCreate && (
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-neutral-900 hover:bg-black rounded-xl shadow-xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-neutral-900 hover:bg-black active:scale-95 rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
             onClick={onOpenCreate}
           >
             <span>+ Add First Task</span>
@@ -120,7 +120,7 @@ export default function TaskList({
               <button
                 key={filter}
                 type="button"
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap ${
                   isSelected
                     ? 'bg-white text-neutral-900 shadow-xs'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/50'
@@ -130,7 +130,7 @@ export default function TaskList({
                 aria-label={filter}
               >
                 <span>{label}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-neutral-100 text-neutral-700' : 'text-neutral-400'}`}>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full transition-colors duration-150 ${isSelected ? 'bg-neutral-100 text-neutral-700' : 'text-neutral-400'}`}>
                   {count}
                 </span>
               </button>
@@ -145,13 +145,13 @@ export default function TaskList({
 
       {/* Tampilan jika filter spesifik tidak memiliki task yang cocok */}
       {filteredTasks.length === 0 ? (
-        <div className="text-center py-14 px-4 bg-[#FAF9F7] border border-neutral-200/70 rounded-3xl">
+        <div className="text-center py-14 px-4 bg-[#FAF9F7] border border-neutral-200/70 rounded-3xl animate-fade-in">
           <p className="text-sm text-neutral-600 mb-3">
             No tasks match the filter &ldquo;{activeFilter}&rdquo;.
           </p>
           <button
             type="button"
-            className="inline-flex items-center px-4 py-2 text-xs font-semibold text-neutral-800 bg-white hover:bg-neutral-100 border border-neutral-300 rounded-xl shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center px-4 py-2 text-xs font-semibold text-neutral-800 bg-white hover:bg-neutral-100 active:scale-95 border border-neutral-300 rounded-xl shadow-2xs transition-all duration-150 cursor-pointer"
             onClick={() => onFilterChange('All')}
           >
             Show all tasks
@@ -159,7 +159,7 @@ export default function TaskList({
         </div>
       ) : activeFilter === 'All' ? (
         /* ── Tab Board: 3 Kolom dengan batasan 3 data per kolom + Expand toggle ── */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+        <div key="board-view" className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start animate-fade-in">
           {KANBAN_COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.id)
             const isOver = dragOverCol === col.id
@@ -201,14 +201,16 @@ export default function TaskList({
         </div>
       ) : (
         /* ── Tab Status (Todo / In Progress / Done): Tampilan GRID Multi-Kolom ── */
-        <TaskGrid
-          status={activeFilter}
-          tasks={filteredTasks}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-          updatingTaskId={updatingTaskId}
-          deletingTaskId={deletingTaskId}
-        />
+        <div key={`grid-view-${activeFilter}`} className="animate-fade-in">
+          <TaskGrid
+            status={activeFilter}
+            tasks={filteredTasks}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            updatingTaskId={updatingTaskId}
+            deletingTaskId={deletingTaskId}
+          />
+        </div>
       )}
     </div>
   )

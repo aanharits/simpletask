@@ -55,42 +55,52 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Search tasks input */}
-            <div className="relative">
+            {/* Search tasks input with smooth expansion */}
+            <div className="relative flex items-center">
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-neutral-900 w-40 sm:w-52 transition shadow-2xs"
+                className="pl-8 pr-7 py-1.5 text-xs bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 w-40 sm:w-52 focus:w-48 sm:focus:w-60 transition-all duration-200 ease-out shadow-2xs"
               />
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="absolute left-2.5 top-2.5 text-neutral-400">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="absolute left-2.5 text-neutral-400 pointer-events-none">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 text-neutral-400 hover:text-neutral-700 text-xs font-bold hover:scale-110 active:scale-95 transition-all duration-150 cursor-pointer animate-pop-in"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
             </div>
 
-            {/* Toggle Create Form Button */}
+            {/* Toggle Create Form Button with smooth micro-interaction */}
             <button
               type="button"
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-black text-white rounded-xl shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
             >
               <span>{showCreateForm ? '− Hide Form' : '+ New Task'}</span>
             </button>
           </div>
         </header>
 
-        {/* Global Alert Notifications */}
+        {/* Global Alert Notifications with slide-down animation */}
         {actionError && (
           <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl shadow-2xs"
+            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-red-800 bg-red-50 border border-red-200 rounded-xl shadow-2xs animate-slide-down"
             role="alert"
           >
             <span>{actionError}</span>
             <button
               type="button"
-              className="text-red-500 hover:text-red-700 font-bold ml-2 text-sm cursor-pointer"
+              className="text-red-500 hover:text-red-700 font-bold ml-2 text-sm hover:scale-110 active:scale-95 transition-transform duration-150 cursor-pointer"
               onClick={clearActionError}
               aria-label="Dismiss error"
             >
@@ -101,13 +111,13 @@ export default function App() {
 
         {actionSuccess && (
           <div
-            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-2xs"
+            className="flex items-center justify-between p-3.5 mb-5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl shadow-2xs animate-slide-down"
             role="status"
           >
             <span>{actionSuccess}</span>
             <button
               type="button"
-              className="text-emerald-500 hover:text-emerald-700 font-bold ml-2 text-sm cursor-pointer"
+              className="text-emerald-500 hover:text-emerald-700 font-bold ml-2 text-sm hover:scale-110 active:scale-95 transition-transform duration-150 cursor-pointer"
               onClick={clearActionSuccess}
               aria-label="Dismiss message"
             >
@@ -116,10 +126,10 @@ export default function App() {
           </div>
         )}
 
-        {/* Create Task Card */}
+        {/* Create Task Card with smooth slide-down entrance */}
         {showCreateForm && (
           <section
-            className="mb-6 bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs"
+            className="mb-6 bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs animate-slide-down"
             aria-labelledby="create-task-heading"
           >
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
@@ -134,7 +144,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowCreateForm(false)}
-                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer"
               >
                 Close
               </button>
