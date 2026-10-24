@@ -19,13 +19,14 @@ const STATUS_PROGRESS = {
   },
 }
 
-// Komponen kartu task dengan gaya Codomo board: title, description, progress ring, avatars, dan actions.
+// Komponen kartu task: title, description, progress ring, avatars, dan actions.
 export default function TaskItem({
   task,
   onUpdate,
   onDelete,
   isUpdating = false,
   isDeleting = false,
+  variant = 'default',
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -85,9 +86,11 @@ export default function TaskItem({
     e.dataTransfer.effectAllowed = 'move'
   }
 
+  const isGrid = variant === 'grid'
+
   if (isEditing) {
     return (
-      <li className="bg-white rounded-2xl border border-neutral-300 p-4 shadow-sm animate-pop-in">
+      <li className={`${isGrid ? 'bg-[#ECEAE7] border-neutral-300' : 'bg-white border-neutral-300'} rounded-2xl border p-4 shadow-sm animate-pop-in`}>
         <div className="flex items-center gap-1.5 mb-3 text-xs font-semibold text-neutral-700 uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" aria-hidden="true" />
           <span>Editing Task #{task.id}</span>
@@ -111,7 +114,11 @@ export default function TaskItem({
 
   return (
     <li
-      className="bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing flex flex-col justify-between animate-fade-in"
+      className={`${
+        isGrid
+          ? 'bg-[#ECEAE7] border-neutral-300/80 hover:bg-[#E5E3DE] hover:border-neutral-400'
+          : 'bg-white border-neutral-200/80 hover:border-neutral-300'
+      } rounded-2xl p-4 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing flex flex-col justify-between animate-fade-in`}
       data-task-id={task.id}
       draggable={!showConfirmDelete}
       onDragStart={handleDragStart}
@@ -167,7 +174,7 @@ export default function TaskItem({
       </div>
 
       {/* Card Footer: Status selector & Actions */}
-      <div className="flex items-center justify-between pt-3 border-t border-neutral-100 flex-wrap gap-2">
+      <div className={`flex items-center justify-between pt-3 border-t ${isGrid ? 'border-neutral-300/70' : 'border-neutral-100'} flex-wrap gap-2`}>
         <span className="text-[11px] font-mono text-neutral-400">ID #{task.id}</span>
 
         {/* Actions & Status selector */}
@@ -178,7 +185,7 @@ export default function TaskItem({
             </label>
             <select
               id={`quick-status-${task.id}`}
-              className="text-[11px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-150 cursor-pointer disabled:opacity-50"
+              className="text-[11px] font-medium text-neutral-700 bg-white hover:bg-neutral-50 border border-neutral-200/90 hover:border-neutral-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-150 cursor-pointer disabled:opacity-50"
               value={selectedStatus}
               disabled={isUpdating || isDeleting}
               onChange={handleStatusChange}
@@ -194,7 +201,7 @@ export default function TaskItem({
             <>
               <button
                 type="button"
-                className="px-2 py-1 text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 active:scale-95 border border-neutral-200 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
+                className="px-2 py-1 text-[11px] font-medium text-neutral-700 hover:text-neutral-900 bg-white hover:bg-neutral-50 active:scale-95 border border-neutral-200/90 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={() => setIsEditing(true)}
                 disabled={isUpdating || isDeleting}
                 aria-label={`Edit task ${task.title}`}
@@ -203,7 +210,7 @@ export default function TaskItem({
               </button>
               <button
                 type="button"
-                className="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-700 bg-red-50/60 hover:bg-red-50 active:scale-95 border border-red-200 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
+                className="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-700 bg-white hover:bg-red-50 active:scale-95 border border-red-200 rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50"
                 onClick={() => setShowConfirmDelete(true)}
                 disabled={isUpdating || isDeleting}
                 aria-label={`Delete task ${task.title}`}

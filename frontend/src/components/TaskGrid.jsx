@@ -22,6 +22,7 @@ export default function TaskGrid({
           onDelete={onDelete}
           isUpdating={updatingTaskId === task.id}
           isDeleting={deletingTaskId === task.id}
+          variant="grid"
         />
       ))}
     </ul>

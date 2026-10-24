@@ -5,7 +5,7 @@ export function ToastItem({ toast, onDismiss }) {
   return (
     <div
       role={isSuccess ? 'status' : 'alert'}
-      className="pointer-events-auto flex items-start gap-3 p-3.5 rounded-2xl bg-neutral-900 border border-neutral-800 shadow-[0_16px_40px_rgba(0,0,0,0.28)] animate-slide-down transition-all duration-200 ease-out"
+      className="pointer-events-auto flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.08)] animate-slide-down transition-all duration-200 ease-out"
       data-toast-id={toast.id}
     >
       {/* Content Text */}
@@ -13,17 +13,15 @@ export function ToastItem({ toast, onDismiss }) {
         <div className="flex items-center gap-1.5 mb-0.5">
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              isSuccess
-                ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
-                : 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.6)]'
+              isSuccess ? 'bg-emerald-500' : 'bg-red-500'
             }`}
             aria-hidden="true"
           />
-          <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 leading-none">
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 leading-none">
             {isSuccess ? 'Success' : 'Notice'}
           </h4>
         </div>
-        <p className="text-xs font-medium text-neutral-100 leading-relaxed break-words">
+        <p className="text-xs font-semibold text-neutral-900 leading-relaxed break-words">
           {toast.message}
         </p>
       </div>
@@ -32,7 +30,7 @@ export function ToastItem({ toast, onDismiss }) {
       <button
         type="button"
         onClick={() => onDismiss(toast.id)}
-        className="text-neutral-400 hover:text-white hover:bg-neutral-800 active:scale-95 w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer shrink-0"
+        className="text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 active:scale-95 w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer shrink-0"
         aria-label="Dismiss notification"
       >
         <span className="text-base leading-none">×</span>

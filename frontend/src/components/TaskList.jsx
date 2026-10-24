@@ -200,7 +200,7 @@ export default function TaskList({
           })}
         </div>
       ) : (
-        /* ── Tab Status (Todo / In Progress / Done): Tampilan GRID Multi-Kolom ── */
+        /* Tab Status (Todo / In Progress / Done): Tampilan GRID Multi-Kolom */
         <div key={`grid-view-${activeFilter}`} className="animate-fade-in">
           <TaskGrid
             status={activeFilter}
