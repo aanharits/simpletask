@@ -3,7 +3,14 @@ import useTasks from './hooks/useTasks'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 
-// Komponen halaman utama yang merender layout, header, form input, dan daftar task.
+const NAV_ITEMS = [
+  { key: 'All', label: 'All Tasks' },
+  { key: 'Todo', label: 'Todo' },
+  { key: 'In Progress', label: 'In Progress' },
+  { key: 'Done', label: 'Done' },
+]
+
+// Komponen halaman utama yang merender layout sidebar + main panel.
 export default function App() {
   const {
     tasks,
@@ -24,175 +31,279 @@ export default function App() {
   } = useTasks()
 
   const [activeFilter, setActiveFilter] = useState('All')
+  const [showForm, setShowForm] = useState(true)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  // Hitung task count per status untuk ditampilkan di sidebar.
+  const countFor = (key) => {
+    if (key === 'All') return tasks.length
+    return tasks.filter((t) => t.status === key).length
+  }
+
+  const currentLabel = NAV_ITEMS.find((n) => n.key === activeFilter)?.label || 'All Tasks'
 
   return (
-    <div className="flex flex-col min-h-screen bg-canvas text-ink font-sans">
-      {/* Floating Navigation Header */}
-      <header className="p-6 pb-0 flex justify-center">
-        <div className="flex items-center justify-between max-w-[980px] w-full bg-white px-6 py-3 rounded-full shadow-[0_4px_24px_rgba(20,20,19,0.04)] border border-border-custom">
+    <div className="flex h-screen bg-[#ECEAE7] text-ink font-sans overflow-hidden">
+      {/* ── Mobile sidebar backdrop ─────────────────── */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-ink/20 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* ── Left Sidebar ────────────────────────────── */}
+      <aside
+        className={`
+          fixed md:static inset-y-0 left-0 z-30 w-56 flex flex-col bg-[#ECEAE7] shrink-0
+          transition-transform duration-200
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
+      >
+        {/* Brand */}
+        <div className="px-5 pt-6 pb-5">
           <div className="flex items-center gap-2">
             <span
               className="w-2.5 h-2.5 rounded-full bg-light-orange shadow-[0_0_0_3px_rgba(243,115,56,0.2)]"
               aria-hidden="true"
             />
-            <span className="text-base font-bold tracking-tight text-ink">Task Tracker</span>
+            <span className="text-sm font-bold tracking-tight text-ink">Task Tracker</span>
           </div>
-          <span className="text-xs sm:text-sm font-medium text-slate-custom">FastAPI + PostgreSQL</span>
         </div>
-      </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-[980px] w-full mx-auto px-4 sm:px-6 pb-16">
-        {/* Editorial Intro Section */}
-        <section className="py-8 sm:py-10">
-          <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-granite mb-2">
-            <span className="text-light-orange text-base leading-none" aria-hidden="true">•</span> SIMPLE TASK / PROJECT TRACKER
-          </span>
-          <h1 className="text-3xl sm:text-4xl md:text-[42px] font-semibold leading-[1.15] tracking-tight text-ink mb-3">
-            Manage your workflow with clarity.
-          </h1>
-          <p className="text-base sm:text-[17px] text-granite max-w-[640px] leading-relaxed mb-6">
-            A full-stack task manager persisting to PostgreSQL. Create, track progress, edit, and organize deliverables without page reload.
-          </p>
+        {/* Navigation */}
+        <nav className="flex-1 px-3 space-y-0.5" aria-label="Task filters">
+          {NAV_ITEMS.map(({ key, label }) => {
+            const isActive = activeFilter === key
+            const count = countFor(key)
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`
+                  w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer
+                  ${isActive
+                    ? 'bg-white/70 text-ink font-semibold shadow-[0_1px_3px_rgba(20,20,19,0.06)]'
+                    : 'text-granite hover:bg-white/40 hover:text-ink font-medium'
+                  }
+                `}
+                onClick={() => {
+                  setActiveFilter(key)
+                  setMobileSidebarOpen(false)
+                }}
+                aria-pressed={isActive}
+                aria-label={key}
+              >
+                <span aria-hidden="true">{label}</span>
+                {count > 0 && (
+                  <span aria-hidden="true" className={`text-[11px] tabular-nums ${isActive ? 'text-slate-custom' : 'text-taupe'}`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </nav>
 
-          {/* Metric Stats Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4" role="region" aria-label="Task progress summary">
-            <div className="bg-lifted border border-border-custom rounded-2xl p-4 flex flex-col gap-1">
-              <span className="text-xs sm:text-sm font-medium text-slate-custom">Total Tasks</span>
-              <span className="text-2xl font-bold tracking-tight text-ink">{stats.total}</span>
-            </div>
-            <div className="bg-lifted border border-border-custom rounded-2xl p-4 flex flex-col gap-1">
-              <span className="text-xs sm:text-sm font-medium text-slate-custom">Todo</span>
-              <span className="text-2xl font-bold tracking-tight text-charcoal">{stats.todo}</span>
-            </div>
-            <div className="bg-lifted border border-border-custom rounded-2xl p-4 flex flex-col gap-1">
-              <span className="text-xs sm:text-sm font-medium text-slate-custom">In Progress</span>
-              <span className="text-2xl font-bold tracking-tight text-clay-brown">{stats.inProgress}</span>
-            </div>
-            <div className="bg-lifted border border-border-custom rounded-2xl p-4 flex flex-col gap-1">
-              <span className="text-xs sm:text-sm font-medium text-slate-custom">Done</span>
-              <span className="text-2xl font-bold tracking-tight text-[#1B4D20]">{stats.done}</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Global Notifications */}
-        {actionError && (
-          <div
-            className="flex items-center gap-3 px-5 py-3 rounded-xl mb-6 text-sm font-medium bg-error-bg text-error-text border border-error-border"
-            role="alert"
-          >
-            <span className="font-bold text-base" aria-hidden="true">⚠</span>
-            <span className="flex-1">{actionError}</span>
-            <button
-              type="button"
-              className="text-xl leading-none opacity-70 hover:opacity-100 cursor-pointer"
-              onClick={clearActionError}
-              aria-label="Dismiss error"
-            >
-              ×
-            </button>
-          </div>
-        )}
-
-        {actionSuccess && (
-          <div
-            className="flex items-center gap-3 px-5 py-3 rounded-xl mb-6 text-sm font-medium bg-success-bg text-success-text border border-success-border"
-            role="status"
-          >
-            <span className="font-bold text-base" aria-hidden="true">✓</span>
-            <span className="flex-1">{actionSuccess}</span>
-            <button
-              type="button"
-              className="text-xl leading-none opacity-70 hover:opacity-100 cursor-pointer"
-              onClick={clearActionSuccess}
-              aria-label="Dismiss message"
-            >
-              ×
-            </button>
-          </div>
-        )}
-
-        {/* Create Task Card Surface */}
-        <section
-          className="bg-lifted border border-border-custom rounded-[24px] shadow-[0_4px_24px_rgba(20,20,19,0.04)] p-6 sm:p-8 mb-8"
-          aria-labelledby="create-task-heading"
+        {/* Stats mini row */}
+        <div
+          className="mx-3 mb-4 p-3 rounded-xl bg-white/40 space-y-1.5"
+          role="region"
+          aria-label="Task progress summary"
         >
-          <div className="mb-6">
-            <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-granite mb-1">
-              <span className="text-light-orange text-base leading-none" aria-hidden="true">•</span> NEW TASK
-            </span>
-            <h2 id="create-task-heading" className="text-2xl font-semibold tracking-tight text-ink mb-1">
-              Create a Task
-            </h2>
-            <p className="text-sm text-slate-custom">
-              Add a new deliverable with title, optional description, and status.
-            </p>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-custom font-medium">Total</span>
+            <span className="font-bold text-ink tabular-nums">{stats.total}</span>
           </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-custom font-medium">In Progress</span>
+            <span className="font-semibold text-clay-brown tabular-nums">{stats.inProgress}</span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-custom font-medium">Done</span>
+            <span className="font-semibold text-[#1B4D20] tabular-nums">{stats.done}</span>
+          </div>
+        </div>
 
-          <TaskForm
-            onSubmit={createTask}
-            isSubmitting={isCreating}
-            buttonText="Create Task"
-            idPrefix="create-task"
-          />
-        </section>
+        {/* New Task button */}
+        <div className="px-3 pb-5">
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-signal-orange text-white text-sm font-semibold shadow-[0_2px_8px_rgba(207,69,0,0.35)] hover:bg-[#b83d00] active:scale-[0.98] transition-all cursor-pointer"
+            onClick={() => {
+              setShowForm(true)
+              setMobileSidebarOpen(false)
+            }}
+          >
+            <span className="text-base leading-none" aria-hidden="true">+</span>
+            New Task
+          </button>
+        </div>
+      </aside>
 
-        {/* Task List Card Surface */}
-        <section
-          className="bg-lifted border border-border-custom rounded-[24px] shadow-[0_4px_24px_rgba(20,20,19,0.04)] p-6 sm:p-8 mb-8"
-          aria-labelledby="task-list-heading"
-        >
-          <h2 id="task-list-heading" className="sr-only">Tasks</h2>
+      {/* ── Main Panel ──────────────────────────────── */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Inner white/cream surface */}
+        <div className="flex-1 m-3 md:m-4 bg-lifted rounded-2xl shadow-[0_2px_16px_rgba(20,20,19,0.07)] flex flex-col overflow-hidden">
 
-          {loading ? (
-            <div className="flex flex-col items-center justify-center p-12 gap-4 text-slate-custom text-sm" role="status" aria-live="polite">
-              <div className="w-8 h-8 border-3 border-taupe border-t-ink rounded-full animate-spin" aria-hidden="true" />
-              <p>Loading tasks from database...</p>
-            </div>
-          ) : loadError ? (
-            <div className="text-center p-10 bg-white border border-error-border rounded-[18px] flex flex-col items-center gap-3" role="alert">
-              <div className="w-9 h-9 rounded-full bg-error-bg text-error-text flex items-center justify-center text-lg font-bold">
-                !
-              </div>
-              <h3 className="text-lg font-bold text-ink">Unable to load tasks</h3>
-              <p className="text-sm text-granite max-w-[440px]">{loadError}</p>
+          {/* Panel header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border-custom shrink-0">
+            <div className="flex items-center gap-3">
+              {/* Mobile hamburger */}
               <button
                 type="button"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-full text-[15px] font-semibold bg-ink text-canvas border-[1.5px] border-ink hover:bg-charcoal transition cursor-pointer"
-                onClick={retryLoad}
+                className="md:hidden p-1.5 rounded-lg text-slate-custom hover:bg-canvas transition cursor-pointer"
+                onClick={() => setMobileSidebarOpen(true)}
+                aria-label="Open sidebar"
               >
-                Retry Connection
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
               </button>
+              <h1 className="text-xl font-semibold tracking-tight text-ink">{currentLabel}</h1>
             </div>
-          ) : (
-            <TaskList
-              tasks={tasks}
-              onUpdate={updateTask}
-              onDelete={deleteTask}
-              updatingTaskId={updatingTaskId}
-              deletingTaskId={deletingTaskId}
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-            />
-          )}
-        </section>
-      </main>
 
-      {/* Editorial Dark Footer */}
-      <footer className="bg-ink text-canvas py-10 px-6 mt-auto">
-        <div className="max-w-[980px] mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <span className="text-base font-bold tracking-tight text-canvas">Task Tracker</span>
-            <p className="text-xs sm:text-sm text-taupe mt-1">
-              Built for GLI Full-Stack Developer Technical Assessment.
-            </p>
+            {/* Notifications area */}
+            <div className="flex items-center gap-2">
+              {actionSuccess && (
+                <div
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-success-bg text-success-text border border-success-border"
+                  role="status"
+                >
+                  <span aria-hidden="true">✓</span>
+                  <span>{actionSuccess}</span>
+                  <button
+                    type="button"
+                    className="opacity-60 hover:opacity-100 ml-0.5 cursor-pointer"
+                    onClick={clearActionSuccess}
+                    aria-label="Dismiss message"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              {actionError && (
+                <div
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-error-bg text-error-text border border-error-border"
+                  role="alert"
+                >
+                  <span aria-hidden="true">⚠</span>
+                  <span>{actionError}</span>
+                  <button
+                    type="button"
+                    className="opacity-60 hover:opacity-100 ml-0.5 cursor-pointer"
+                    onClick={clearActionError}
+                    aria-label="Dismiss error"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="text-xs text-taupe">
-            <span>FastAPI • SQLModel • PostgreSQL 17 • React + Vite</span>
+
+          {/* Mobile notifications (below header) */}
+          {(actionError || actionSuccess) && (
+            <div className="sm:hidden px-4 py-3 border-b border-border-custom space-y-2 shrink-0">
+              {actionSuccess && (
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium bg-success-bg text-success-text border border-success-border" role="status">
+                  <span>✓ {actionSuccess}</span>
+                  <button type="button" onClick={clearActionSuccess} className="opacity-60 hover:opacity-100 cursor-pointer" aria-label="Dismiss message">×</button>
+                </div>
+              )}
+              {actionError && (
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium bg-error-bg text-error-text border border-error-border" role="alert">
+                  <span>⚠ {actionError}</span>
+                  <button type="button" onClick={clearActionError} className="opacity-60 hover:opacity-100 cursor-pointer" aria-label="Dismiss error">×</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Create Task Form — collapsible */}
+          {showForm && (
+            <div className="shrink-0 border-b border-border-custom bg-canvas/50">
+              <div className="px-6 py-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 id="create-task-heading" className="text-sm font-bold uppercase tracking-wider text-granite">
+                    New Task
+                  </h2>
+                  <button
+                    type="button"
+                    className="text-slate-custom hover:text-ink transition cursor-pointer p-1 rounded-md hover:bg-canvas"
+                    onClick={() => setShowForm(false)}
+                    aria-label="Dismiss form"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+                <TaskForm
+                  onSubmit={async (payload) => {
+                    await createTask(payload)
+                    setShowForm(false)
+                  }}
+                  isSubmitting={isCreating}
+                  buttonText="Create Task"
+                  idPrefix="create-task"
+                  onCancel={() => setShowForm(false)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Scrollable task area */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-6 py-4 h-full">
+              {loading ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-custom text-sm" role="status" aria-live="polite">
+                  <div className="w-7 h-7 border-[2.5px] border-taupe border-t-ink rounded-full animate-spin" aria-hidden="true" />
+                  <p>Loading tasks from database...</p>
+                </div>
+              ) : loadError ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3 text-center" role="alert">
+                  <div className="w-8 h-8 rounded-full bg-error-bg text-error-text flex items-center justify-center font-bold">
+                    !
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-ink mb-1">Unable to load tasks</h3>
+                    <p className="text-xs text-granite max-w-xs">{loadError}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded-full text-sm font-semibold bg-ink text-canvas hover:bg-charcoal transition cursor-pointer"
+                    onClick={retryLoad}
+                  >
+                    Retry Connection
+                  </button>
+                </div>
+              ) : (
+                <TaskList
+                  tasks={tasks}
+                  onUpdate={updateTask}
+                  onDelete={deleteTask}
+                  updatingTaskId={updatingTaskId}
+                  deletingTaskId={deletingTaskId}
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Panel Footer */}
+          <div className="shrink-0 flex items-center justify-between px-6 py-3 border-t border-border-custom">
+            <span className="text-[11px] text-taupe">FastAPI · SQLModel · PostgreSQL 17 · React + Vite</span>
+            <span className="text-[11px] text-taupe">
+              Built for GLI Technical Assessment
+            </span>
           </div>
         </div>
-      </footer>
+      </main>
     </div>
   )
 }
