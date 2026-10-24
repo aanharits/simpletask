@@ -112,4 +112,109 @@ describe('useTasks Custom Hook Tests', () => {
     expect(result.current.tasks).toHaveLength(0)
     expect(result.current.deletingTaskId).toBeNull()
   })
+
+  it('filters displayedTasks based on searchQuery case-insensitively', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
+
+    const { result } = renderHook(() => useTasks())
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.displayedTasks).toHaveLength(2)
+
+    act(() => {
+      result.current.setSearchQuery('task 1')
+    })
+    expect(result.current.displayedTasks).toHaveLength(1)
+    expect(result.current.displayedTasks[0].title).toBe('Task 1')
+
+    // Search by description
+    act(() => {
+      result.current.setSearchQuery('desc 2')
+    })
+    expect(result.current.displayedTasks).toHaveLength(1)
+    expect(result.current.displayedTasks[0].title).toBe('Task 2')
+
+    // Search non-matching query
+    act(() => {
+      result.current.setSearchQuery('non-existent')
+    })
+    expect(result.current.displayedTasks).toHaveLength(0)
+  })
+
+  it('manages form visibility states and toggles when tasks exist', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
+
+    const { result } = renderHook(() => useTasks())
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.canHideForm).toBe(true)
+    expect(result.current.isFormOpen).toBe(true)
+
+    act(() => {
+      result.current.toggleForm()
+    })
+    expect(result.current.isFormOpen).toBe(false)
+
+    act(() => {
+      result.current.openCreateForm()
+    })
+    expect(result.current.isFormOpen).toBe(true)
+
+    act(() => {
+      result.current.closeForm()
+    })
+    expect(result.current.isFormOpen).toBe(false)
+  })
+
+  it('keeps form permanently open when no tasks exist', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
+
+    const { result } = renderHook(() => useTasks())
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.canHideForm).toBe(false)
+    expect(result.current.isFormOpen).toBe(true)
+
+    act(() => {
+      result.current.toggleForm()
+    })
+    // Still open because hasTasks is false
+    expect(result.current.isFormOpen).toBe(true)
+  })
+
+  it('pushes toasts when creating, updating, and deleting tasks', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
+    vi.spyOn(apiClient, 'post').mockResolvedValue({
+      data: { id: 3, title: 'New Hook Task', description: '', status: 'Todo' },
+    })
+
+    const { result } = renderHook(() => useTasks())
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
+
+    await act(async () => {
+      await result.current.createTask({ title: 'New Hook Task', description: '', status: 'Todo' })
+    })
+
+    expect(result.current.toasts.length).toBeGreaterThan(0)
+    expect(result.current.toasts[0].message).toContain('New Hook Task')
+    expect(result.current.toasts[0].type).toBe('success')
+
+    act(() => {
+      result.current.removeToast(result.current.toasts[0].id)
+    })
+    expect(result.current.toasts).toHaveLength(0)
+  })
 })
+

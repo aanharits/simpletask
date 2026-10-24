@@ -1,74 +1,36 @@
-import { useState, useEffect } from 'react'
 import useTasks from './hooks/useTasks'
-import useToast from './hooks/useToast'
 import Header from './components/Header'
 import CreateTaskSection from './components/CreateTaskSection'
 import TaskList from './components/TaskList'
 import ToastContainer from './components/Toast'
 import Footer from './components/Footer'
 
-// Komponen root Simple Task: bertindak sebagai controller / orchestrator halaman utama.
+// Komponen root Simple Task: Pure presentation layer yang mengonsumsi state & controller dari useTasks.
 export default function App() {
   const {
     tasks,
+    displayedTasks,
     loading,
     loadError,
-    actionError,
-    actionSuccess,
-    isCreating,
-    updatingTaskId,
-    deletingTaskId,
+    retryLoad,
     createTask,
     updateTask,
     deleteTask,
-    retryLoad,
-    clearActionError,
-    clearActionSuccess,
+    isCreating,
+    updatingTaskId,
+    deletingTaskId,
+    activeFilter,
+    setActiveFilter,
+    searchQuery,
+    setSearchQuery,
+    isFormOpen,
+    canHideForm,
+    toggleForm,
+    closeForm,
+    openCreateForm,
+    toasts,
+    removeToast,
   } = useTasks()
-
-  const { toasts, showSuccess, showError, removeToast } = useToast()
-
-  const [activeFilter, setActiveFilter] = useState('All')
-  const [showCreateForm, setShowCreateForm] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // Sinkronkan notifikasi sukses atau error ke modul toaster mengambang
-  useEffect(() => {
-    if (actionSuccess) {
-      showSuccess(actionSuccess)
-      clearActionSuccess()
-    }
-  }, [actionSuccess, showSuccess, clearActionSuccess])
-
-  useEffect(() => {
-    if (actionError) {
-      showError(actionError)
-      clearActionError()
-    }
-  }, [actionError, showError, clearActionError])
-
-  // Form wajib selalu terbuka jika belum ada task sama sekali
-  const hasTasks = tasks.length > 0
-  const isFormOpen = !hasTasks || showCreateForm
-
-  const handleOpenCreateForm = () => {
-    setShowCreateForm(true)
-    const titleInput = document.getElementById('create-task-title')
-    if (titleInput) {
-      titleInput.focus()
-      titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }
-
-  // Filter tasks berdasarkan activeFilter dan search query jika ada
-  const displayedTasks = tasks.filter((t) => {
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      const matchText = t.title.toLowerCase().includes(q) || (t.description && t.description.toLowerCase().includes(q))
-      if (!matchText) return false
-    }
-    return true
-  })
 
   return (
     <div className="min-h-screen bg-[#ECEAE7] p-3 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
@@ -82,16 +44,16 @@ export default function App() {
           taskCount={tasks.length}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          canHideForm={hasTasks}
+          canHideForm={canHideForm}
           isFormOpen={isFormOpen}
-          onToggleForm={() => setShowCreateForm(!isFormOpen)}
+          onToggleForm={toggleForm}
         />
 
         {/* Modular Collapsible Create Task Section */}
         <CreateTaskSection
           isOpen={isFormOpen}
-          canClose={hasTasks}
-          onClose={() => setShowCreateForm(false)}
+          canClose={canHideForm}
+          onClose={closeForm}
           onSubmit={createTask}
           isSubmitting={isCreating}
         />
@@ -127,7 +89,7 @@ export default function App() {
               deletingTaskId={deletingTaskId}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
-              onOpenCreate={handleOpenCreateForm}
+              onOpenCreate={openCreateForm}
             />
           )}
         </section>

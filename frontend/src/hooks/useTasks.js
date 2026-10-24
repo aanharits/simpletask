@@ -5,9 +5,13 @@ import {
   updateTask as apiUpdateTask,
   deleteTask as apiDeleteTask,
 } from '../api/tasks'
+import useToast from './useToast'
 
-// Custom hook untuk mengelola global state, HTTP request, dan CRUD task.
+// Custom hook untuk mengelola state data tasks, CRUD HTTP request, 
+// filter & pencarian, manajemen tampilan form, serta integrasi feedback toaster.
 export function useTasks() {
+  const { toasts, showSuccess, showError, removeToast, clearAll: clearToasts } = useToast()
+
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -16,6 +20,11 @@ export function useTasks() {
   const [isCreating, setIsCreating] = useState(false)
   const [updatingTaskId, setUpdatingTaskId] = useState(null)
   const [deletingTaskId, setDeletingTaskId] = useState(null)
+
+  // Controller state: status filter, query pencarian, dan visibilitas accordion form
+  const [activeFilter, setActiveFilter] = useState('All')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showCreateForm, setShowCreateForm] = useState(true)
 
   useEffect(() => {
     const fetchInitialTasks = async () => {
@@ -59,7 +68,7 @@ export function useTasks() {
     }
   }, [])
 
-  // Membuat task baru, menambahkannya ke state, dan memunculkan feedback sukses.
+  // Membuat task baru, menambahkannya ke state, dan memunculkan feedback toaster sukses.
   const handleCreateTask = useCallback(async (payload) => {
     setIsCreating(true)
     setActionError('')
@@ -67,15 +76,19 @@ export function useTasks() {
       const newTask = await apiCreateTask(payload)
       // Pertahankan urutan ID ascending agar posisi task tetap stabil di UI.
       setTasks((prev) => [...prev, newTask].sort((a, b) => a.id - b.id))
-      setActionSuccess(`Task "${newTask.title}" created successfully.`)
+      const successMsg = `Task "${newTask.title}" created successfully.`
+      setActionSuccess(successMsg)
+      showSuccess(successMsg)
       return newTask
     } catch (err) {
-      setActionError(err.message || 'Failed to create task.')
+      const errorMsg = err.message || 'Failed to create task.'
+      setActionError(errorMsg)
+      showError(errorMsg)
       throw err
     } finally {
       setIsCreating(false)
     }
-  }, [])
+  }, [showSuccess, showError])
 
   // Memperbarui task di database dan mengupdate state lokal tanpa reload halaman.
   const handleUpdateTask = useCallback(async (taskId, payload, options = {}) => {
@@ -88,16 +101,20 @@ export function useTasks() {
       )
       // Tampilkan toaster sukses hanya jika aksi tidak di-set silent (misal: bukan drag & drop)
       if (!options.silent) {
-        setActionSuccess(`Task #${taskId} updated successfully.`)
+        const successMsg = `Task #${taskId} updated successfully.`
+        setActionSuccess(successMsg)
+        showSuccess(successMsg)
       }
       return updated
     } catch (err) {
-      setActionError(err.message || 'Failed to update task.')
+      const errorMsg = err.message || 'Failed to update task.'
+      setActionError(errorMsg)
+      showError(errorMsg)
       throw err
     } finally {
       setUpdatingTaskId(null)
     }
-  }, [])
+  }, [showSuccess, showError])
 
   // Menghapus task dari database dan mengeluarkan task tersebut dari state lokal.
   const handleDeleteTask = useCallback(async (taskId) => {
@@ -106,14 +123,18 @@ export function useTasks() {
     try {
       await apiDeleteTask(taskId)
       setTasks((prev) => prev.filter((t) => t.id !== taskId))
-      setActionSuccess(`Task #${taskId} deleted successfully.`)
+      const successMsg = `Task #${taskId} deleted successfully.`
+      setActionSuccess(successMsg)
+      showSuccess(successMsg)
     } catch (err) {
-      setActionError(err.message || 'Failed to delete task.')
+      const errorMsg = err.message || 'Failed to delete task.'
+      setActionError(errorMsg)
+      showError(errorMsg)
       throw err
     } finally {
       setDeletingTaskId(null)
     }
-  }, [])
+  }, [showSuccess, showError])
 
   // Hitung jumlah task per status menggunakan useMemo agar efisien saat render ulang.
   const stats = useMemo(() => {
@@ -125,8 +146,50 @@ export function useTasks() {
     }
   }, [tasks])
 
+  // Filter tasks berdasarkan searchQuery (case-insensitive di title dan description)
+  const displayedTasks = useMemo(() => {
+    if (!searchQuery.trim()) return tasks
+    const q = searchQuery.toLowerCase().trim()
+    return tasks.filter((t) => {
+      return (
+        t.title.toLowerCase().includes(q) ||
+        (t.description && t.description.toLowerCase().includes(q))
+      )
+    })
+  }, [tasks, searchQuery])
+
+  // Logika visibilitas form: form wajib terbuka jika belum ada task sama sekali
+  const hasTasks = tasks.length > 0
+  const isFormOpen = !hasTasks || showCreateForm
+  const canHideForm = hasTasks
+
+  const toggleForm = useCallback(() => {
+    if (!hasTasks) return
+    setShowCreateForm((prev) => !prev)
+  }, [hasTasks])
+
+  const closeForm = useCallback(() => {
+    if (hasTasks) {
+      setShowCreateForm(false)
+    }
+  }, [hasTasks])
+
+  const openCreateForm = useCallback(() => {
+    setShowCreateForm(true)
+    setTimeout(() => {
+      const titleInput = document.getElementById('create-task-title')
+      if (titleInput) {
+        titleInput.focus()
+        titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 50)
+  }, [])
+
   return {
+    // Data states
     tasks,
+    displayedTasks,
+    stats,
     loading,
     loadError,
     actionError,
@@ -134,13 +197,34 @@ export function useTasks() {
     isCreating,
     updatingTaskId,
     deletingTaskId,
-    stats,
+
+    // CRUD Actions
     createTask: handleCreateTask,
     updateTask: handleUpdateTask,
     deleteTask: handleDeleteTask,
     retryLoad,
     clearActionError: () => setActionError(''),
     clearActionSuccess: () => setActionSuccess(''),
+
+    // Search & Filter Controller states
+    activeFilter,
+    setActiveFilter,
+    searchQuery,
+    setSearchQuery,
+
+    // Form Presentation & Visibility states
+    isFormOpen,
+    canHideForm,
+    toggleForm,
+    closeForm,
+    openCreateForm,
+
+    // Toaster states & methods
+    toasts,
+    removeToast,
+    showSuccess,
+    showError,
+    clearToasts,
   }
 }
 
