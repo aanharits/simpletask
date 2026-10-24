@@ -48,7 +48,7 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -59,7 +59,7 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-16px);
   }
   to {
     opacity: 1;
@@ -70,7 +70,7 @@
 @keyframes popIn {
   0% {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.94);
   }
   100% {
     opacity: 1;
@@ -79,13 +79,42 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-slide-down {
-  animation: slideDown 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-pop-in {
-  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Form smooth roll-down (expand) and roll-up (collapse) */
+.form-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: 0;
+  transition:
+    grid-template-rows 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 380ms cubic-bezier(0.16, 1, 0.3, 1),
+    margin-bottom 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-accordion.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-bottom: 1.5rem;
+}
+
+.form-accordion-inner {
+  min-height: 0;
+  overflow: hidden;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(-20px);
+}
+
+.form-accordion.is-open .form-accordion-inner {
+  transform: translateY(0);
 }

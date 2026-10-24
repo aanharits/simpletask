@@ -26,6 +26,19 @@ export default function App() {
   const [showCreateForm, setShowCreateForm] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Jika belum ada data sama sekali, form wajib selalu terbuka dan tidak bisa di-hide.
+  const hasTasks = tasks.length > 0
+  const isFormOpen = !hasTasks || showCreateForm
+
+  const handleOpenCreateForm = () => {
+    setShowCreateForm(true)
+    const titleInput = document.getElementById('create-task-title')
+    if (titleInput) {
+      titleInput.focus()
+      titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+
   // Filter tasks berdasarkan activeFilter dan search query jika ada
   const displayedTasks = tasks.filter((t) => {
     if (searchQuery.trim()) {
@@ -80,14 +93,16 @@ export default function App() {
               )}
             </div>
 
-            {/* Toggle Create Form Button with smooth micro-interaction */}
-            <button
-              type="button"
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
-            >
-              <span>{showCreateForm ? '− Hide Form' : '+ New Task'}</span>
-            </button>
+            {/* Toggle Create Form Button: hanya muncul jika sudah ada data task */}
+            {hasTasks && (
+              <button
+                type="button"
+                onClick={() => setShowCreateForm(!isFormOpen)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
+              >
+                <span>{isFormOpen ? '− Hide Form' : '+ New Task'}</span>
+              </button>
+            )}
           </div>
         </header>
 
@@ -126,38 +141,43 @@ export default function App() {
           </div>
         )}
 
-        {/* Create Task Card with smooth slide-down entrance */}
-        {showCreateForm && (
-          <section
-            className="mb-6 bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs animate-slide-down"
-            aria-labelledby="create-task-heading"
-          >
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
-              <div>
-                <h2 id="create-task-heading" className="text-sm font-bold text-neutral-900">
-                  Create a Task
-                </h2>
-                <p className="text-xs text-neutral-500">
-                  Add a new task item with title, optional description, and status.
-                </p>
+        {/* Create Task Card with smooth accordion roll-down & roll-up animation */}
+        <div className={`form-accordion ${isFormOpen ? 'is-open' : ''}`}>
+          <div className="form-accordion-inner">
+            <section
+              className="bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs"
+              aria-labelledby="create-task-heading"
+            >
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
+                <div>
+                  <h2 id="create-task-heading" className="text-sm font-bold text-neutral-900">
+                    Create a Task
+                  </h2>
+                  <p className="text-xs text-neutral-500">
+                    Add a new task item with title, optional description, and status.
+                  </p>
+                </div>
+                {/* Tombol Close hanya muncul jika sudah ada data task */}
+                {hasTasks && (
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateForm(false)}
+                    className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer"
+                  >
+                    Close
+                  </button>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => setShowCreateForm(false)}
-                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
 
-            <TaskForm
-              onSubmit={createTask}
-              isSubmitting={isCreating}
-              buttonText="Create Task"
-              idPrefix="create-task"
-            />
-          </section>
-        )}
+              <TaskForm
+                onSubmit={createTask}
+                isSubmitting={isCreating}
+                buttonText="Create Task"
+                idPrefix="create-task"
+              />
+            </section>
+          </div>
+        </div>
 
         {/* Main Board Section */}
         <section className="flex-1" aria-labelledby="task-list-heading">
@@ -190,7 +210,7 @@ export default function App() {
               deletingTaskId={deletingTaskId}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
-              onOpenCreate={() => setShowCreateForm(true)}
+              onOpenCreate={handleOpenCreateForm}
             />
           )}
         </section>

@@ -245,4 +245,47 @@ describe('Task Tracker App Component Tests (with Axios)', () => {
     expect(err.message).toBe('Title must not be empty, Status must be Todo, In Progress, or Done')
     expect(err.status).toBe(422)
   })
+
+  it('does not allow hiding form when no tasks exist', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/no tasks recorded yet/i)).toBeInTheDocument()
+    })
+
+    // Form is open and Title input is accessible
+    expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
+
+    // No Hide Form button in header or Close button in form
+    expect(screen.queryByRole('button', { name: /hide form/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^close$/i })).not.toBeInTheDocument()
+  })
+
+  it('allows hiding and expanding the form when tasks exist', async () => {
+    const user = userEvent.setup()
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Design API contract' })).toBeInTheDocument()
+    })
+
+    // Button Hide Form is present
+    const hideBtn = screen.getByRole('button', { name: /hide form/i })
+    expect(hideBtn).toBeInTheDocument()
+
+    // User clicks Hide Form
+    await user.click(hideBtn)
+
+    // Header button updates to "+ New Task"
+    const newBtn = screen.getByRole('button', { name: /new task/i })
+    expect(newBtn).toBeInTheDocument()
+
+    // User clicks New Task to reopen form
+    await user.click(newBtn)
+    expect(screen.getByRole('button', { name: /hide form/i })).toBeInTheDocument()
+  })
 })
