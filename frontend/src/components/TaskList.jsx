@@ -66,36 +66,51 @@ export default function TaskList({
     return task.status === activeFilter
   })
 
-  // Tampilkan empty state global jika belum ada data task
+  // Tampilkan empty state global jika belum ada data task (centered, modern, dan eye-catching)
   if (tasks.length === 0) {
     return (
       <div
-        className="flex flex-col items-center justify-center text-center p-12 bg-[#F7F6F4] border border-dashed border-neutral-300 rounded-3xl"
+        className="flex-1 flex flex-col items-center justify-center min-h-[460px] w-full py-12 px-4"
         role="region"
         aria-label="No tasks"
       >
-        <div className="w-12 h-12 rounded-2xl bg-white border border-neutral-200 text-neutral-400 flex items-center justify-center mb-3 shadow-2xs">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
+        <div className="max-w-md w-full bg-[#FAF9F7] border border-neutral-200/90 rounded-[28px] p-8 sm:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center">
+          {/* Eye-catching icon badge */}
+          <div className="w-16 h-16 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex items-center justify-center text-neutral-800 mb-4" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <path d="M9 16l2 2 4-4" />
+            </svg>
+          </div>
+
+          <h3 className="text-lg font-bold text-neutral-900 tracking-tight mb-2">No tasks recorded yet</h3>
+          <p className="text-xs sm:text-sm text-neutral-500 max-w-xs leading-relaxed mb-6">
+            Stay organized and keep deliverables on track. Create your first task to start managing your workflow.
+          </p>
+
+          {onOpenCreate && (
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-black rounded-xl shadow-xs hover:shadow-md transition cursor-pointer"
+              onClick={onOpenCreate}
+            >
+              <span className="text-base leading-none">+</span>
+              <span>Add First Task</span>
+            </button>
+          )}
+
+          {/* Workflow preview pills (fulfills visual hierarchy) */}
+          <div className="flex items-center gap-2 pt-6 mt-6 border-t border-neutral-200/60 text-[11px] font-medium text-neutral-400">
+            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-neutral-400" /> Todo</span>
+            <span className="text-neutral-300">→</span>
+            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> In Progress</span>
+            <span className="text-neutral-300">→</span>
+            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Done</span>
+          </div>
         </div>
-        <h3 className="text-base font-bold text-neutral-900 mb-1">No tasks recorded yet</h3>
-        <p className="text-xs text-neutral-500 max-w-sm mb-4 leading-relaxed">
-          Get started by filling out the form to add your first task.
-          Your tasks are stored persistently in PostgreSQL.
-        </p>
-        {onOpenCreate && (
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-neutral-900 hover:bg-black rounded-xl shadow-xs transition cursor-pointer"
-            onClick={onOpenCreate}
-          >
-            <span>+ Add First Task</span>
-          </button>
-        )}
       </div>
     )
   }
