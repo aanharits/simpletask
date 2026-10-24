@@ -78,7 +78,7 @@ export function useTasks() {
   }, [])
 
   // Memperbarui task di database dan mengupdate state lokal tanpa reload halaman.
-  const handleUpdateTask = useCallback(async (taskId, payload) => {
+  const handleUpdateTask = useCallback(async (taskId, payload, options = {}) => {
     setUpdatingTaskId(taskId)
     setActionError('')
     try {
@@ -86,7 +86,10 @@ export function useTasks() {
       setTasks((prev) =>
         prev.map((t) => (t.id === taskId ? updated : t))
       )
-      setActionSuccess(`Task #${taskId} updated successfully.`)
+      // Tampilkan toaster sukses hanya jika aksi tidak di-set silent (misal: bukan drag & drop)
+      if (!options.silent) {
+        setActionSuccess(`Task #${taskId} updated successfully.`)
+      }
       return updated
     } catch (err) {
       setActionError(err.message || 'Failed to update task.')

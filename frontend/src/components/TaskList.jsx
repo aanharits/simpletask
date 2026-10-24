@@ -192,7 +192,7 @@ export default function TaskList({
                   const idStr = e.dataTransfer.getData('text/plain')
                   const taskId = Number(idStr)
                   if (taskId && !isNaN(taskId)) {
-                    onUpdate(taskId, { status: col.id })
+                    onUpdate(taskId, { status: col.id }, { silent: true })
                   }
                 }}
               />

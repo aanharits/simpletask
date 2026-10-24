@@ -46,7 +46,7 @@ export default function TaskItem({
     setSelectedStatus(newStatus)
     setItemError('')
     try {
-      await onUpdate(task.id, { status: newStatus })
+      await onUpdate(task.id, { status: newStatus }, { silent: true })
     } catch (err) {
       setSelectedStatus(task.status)
       setItemError(err.message || 'Failed to update status.')
