@@ -1,58 +1,45 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Sofia Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Surfaces */
-  --color-canvas: #F3F0EE;
-  --color-lifted: #FCFBFA;
+  /* Codomo Reference Color Palette */
+  --color-outer-canvas: #EBE9E6;
+  --color-app-surface: #FFFFFF;
+  --color-sidebar-bg: #FAF9F7;
+  --color-column-bg: #F2F1EF;
+  --color-card-bg: #FFFFFF;
 
-  /* Ink & Neutrals */
-  --color-ink: #141413;
-  --color-charcoal: #262627;
-  --color-granite: #555555;
-  --color-slate-custom: #696969;
-  --color-taupe: #D1CDC7;
-  --color-border-custom: #E0DDD8;
+  /* Typography & Ink */
+  --color-text-primary: #18181B;
+  --color-text-secondary: #71717A;
+  --color-text-muted: #A1A1AA;
+  --color-border-subtle: #E4E3DF;
+  --color-border-hover: #D4D3CF;
 
-  /* Accents */
-  --color-signal-orange: #CF4500;
-  --color-light-orange: #F37338;
-  --color-clay-brown: #9A3A0A;
-  --color-link-blue: #3860BE;
-
-  /* Status Colors */
-  --color-status-todo-bg: #EDEAE6;
-  --color-status-todo-text: #262627;
-  --color-status-todo-border: #D8D3CC;
-
-  --color-status-prog-bg: #FFF1E8;
-  --color-status-prog-text: #9A3A0A;
-  --color-status-prog-border: #F5C8AC;
-
-  --color-status-done-bg: #EAF3EC;
-  --color-status-done-text: #1B4D20;
-  --color-status-done-border: #B8DDBE;
+  /* Accent & Status Colors */
+  --color-brand-orange: #F97316;
+  --color-status-planned: #64748B;
+  --color-status-progress: #F59E0B;
+  --color-status-done: #10B981;
 
   /* Feedback Colors */
-  --color-error-bg: #FDF2F2;
-  --color-error-text: #9B1C1C;
-  --color-error-border: #F8B4B4;
-
-  --color-success-bg: #EDF7EE;
-  --color-success-text: #1E4620;
-  --color-success-border: #C8E6C9;
+  --color-error-bg: #FEF2F2;
+  --color-error-text: #B91C1C;
+  --color-error-border: #FECACA;
+  --color-success-bg: #ECFDF5;
+  --color-success-text: #047857;
+  --color-success-border: #A7F3D0;
 }
 
 @layer base {
   body {
-    background-color: #F3F0EE;
-    color: #141413;
+    background-color: #EBE9E6;
+    color: #18181B;
     font-family: var(--font-sans);
-    line-height: 1.45;
-    font-weight: 450;
-    min-height: 100vh;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
   }
 }

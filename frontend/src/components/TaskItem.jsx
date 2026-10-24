@@ -1,28 +1,25 @@
 import { useState } from 'react'
 import TaskForm from './TaskForm'
 
-const CARD_STYLES = {
+const STATUS_PROGRESS = {
   'Todo': {
-    container: 'bg-[#F5F2ED] border-[#E3DED7] hover:border-[#D0CAC0]',
-    badge: 'bg-status-todo-bg text-status-todo-text border-status-todo-border',
-    iconBox: 'border-slate-custom/40 bg-white/80 text-slate-custom',
-    checkIcon: null,
+    label: '0%',
+    badge: 'text-neutral-500 bg-neutral-100 border-neutral-200',
+    icon: '○',
   },
   'In Progress': {
-    container: 'bg-[#FFF2EA] border-[#FCD7C0] hover:border-[#F5BCA0]',
-    badge: 'bg-status-prog-bg text-status-prog-text border-status-prog-border',
-    iconBox: 'border-light-orange bg-white/80 text-light-orange',
-    checkIcon: '⚡',
+    label: '50%',
+    badge: 'text-amber-700 bg-amber-50 border-amber-200',
+    icon: '◑',
   },
   'Done': {
-    container: 'bg-[#EEF7F0] border-[#CDE5D2] hover:border-[#B4D7BC]',
-    badge: 'bg-status-done-bg text-status-done-text border-status-done-border',
-    iconBox: 'border-[#2E7D32] bg-[#2E7D32] text-white',
-    checkIcon: '✓',
+    label: '100%',
+    badge: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    icon: '●',
   },
 }
 
-// Komponen kartu task dengan modern minimalist card layout terinspirasi dari referensi desain.
+// Komponen kartu task dengan gaya Codomo board: title, description, progress ring, avatars, dan actions.
 export default function TaskItem({
   task,
   onUpdate,
@@ -34,15 +31,24 @@ export default function TaskItem({
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [itemError, setItemError] = useState('')
 
+  const [selectedStatus, setSelectedStatus] = useState(task.status)
+
+  // Sinkronkan status lokal saat status diubah server atau prop diperbarui.
+  if (selectedStatus !== task.status && !isUpdating) {
+    setSelectedStatus(task.status)
+  }
+
   // Memperbarui status task saat dropdown status diubah pengguna.
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value
-    if (newStatus === task.status) return
+    if (newStatus === selectedStatus) return
 
+    setSelectedStatus(newStatus)
     setItemError('')
     try {
       await onUpdate(task.id, { status: newStatus })
     } catch (err) {
+      setSelectedStatus(task.status)
       setItemError(err.message || 'Failed to update status.')
     }
   }
@@ -74,13 +80,17 @@ export default function TaskItem({
     }
   }
 
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', String(task.id))
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
   if (isEditing) {
     return (
-      <li className="bg-lifted border-[1.5px] border-ink rounded-2xl p-5 sm:p-6 flex flex-col gap-4 shadow-[0_4px_24px_rgba(20,20,19,0.04)]">
-        <div className="pb-3 border-b border-border-custom">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-granite">
-            <span className="text-light-orange text-base leading-none" aria-hidden="true">•</span> EDITING TASK #{task.id}
-          </span>
+      <li className="bg-white rounded-2xl border border-neutral-300 p-4 shadow-sm">
+        <div className="flex items-center gap-1.5 mb-3 text-xs font-semibold text-neutral-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" aria-hidden="true" />
+          <span>Editing Task #{task.id}</span>
         </div>
         <TaskForm
           initialData={task}
@@ -97,19 +107,21 @@ export default function TaskItem({
     )
   }
 
-  const cardConfig = CARD_STYLES[task.status] || CARD_STYLES['Todo']
+  const prog = STATUS_PROGRESS[task.status] || STATUS_PROGRESS['Todo']
 
   return (
     <li
-      className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 transition-all duration-200 shadow-[0_2px_8px_rgba(20,20,19,0.03)] hover:shadow-md ${cardConfig.container}`}
+      className="bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 transition-all cursor-grab active:cursor-grabbing flex flex-col justify-between"
       data-task-id={task.id}
+      draggable={!showConfirmDelete}
+      onDragStart={handleDragStart}
     >
       {itemError && (
-        <div className="flex items-center justify-between px-3 py-2 text-xs font-medium bg-error-bg text-error-text border border-error-border rounded-lg" role="alert">
+        <div className="flex items-center justify-between p-2 mb-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl" role="alert">
           <span>{itemError}</span>
           <button
             type="button"
-            className="text-lg leading-none cursor-pointer opacity-70 hover:opacity-100 ml-2"
+            className="text-red-500 hover:text-red-700 font-bold ml-2 cursor-pointer"
             onClick={() => setItemError('')}
             aria-label="Dismiss error"
           >
@@ -119,105 +131,112 @@ export default function TaskItem({
       )}
 
       <div>
-        {/* Card Header: Checkbox indicator, Title, and Actions */}
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <div className="flex items-start gap-2.5 flex-1 min-w-0">
-            {/* Soft Checkbox Icon */}
-            <div
-              className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold transition-colors ${cardConfig.iconBox}`}
-              aria-hidden="true"
-            >
-              {cardConfig.checkIcon}
-            </div>
-
-            <h3
-              className={`text-base font-bold tracking-tight break-words ${
-                task.status === 'Done' ? 'text-slate-custom line-through' : 'text-ink'
-              }`}
-            >
-              {task.title}
-            </h3>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {!showConfirmDelete ? (
-              <>
-                <button
-                  type="button"
-                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-ink border border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
-                  onClick={() => setIsEditing(true)}
-                  disabled={isUpdating || isDeleting}
-                  aria-label={`Edit task ${task.title}`}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-error-text border border-error-border hover:border-error-text hover:bg-error-bg active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
-                  onClick={() => setShowConfirmDelete(true)}
-                  disabled={isUpdating || isDeleting}
-                  aria-label={`Delete task ${task.title}`}
-                >
-                  Delete
-                </button>
-              </>
-            ) : (
-              <div className="flex items-center gap-1.5" role="group" aria-label="Confirm deletion">
-                <span className="text-xs font-semibold text-error-text">Delete?</span>
-                <button
-                  type="button"
-                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-error-text text-white hover:opacity-90 active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? '...' : 'Yes, Delete'}
-                </button>
-                <button
-                  type="button"
-                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white text-ink border border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60"
-                  onClick={() => setShowConfirmDelete(false)}
-                  disabled={isDeleting}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Task Title */}
+        <h3 className={`text-sm font-bold leading-snug break-words mb-1 ${task.status === 'Done' ? 'text-neutral-500 line-through' : 'text-neutral-900'}`}>
+          {task.title}
+        </h3>
 
         {/* Task Description */}
         {task.description ? (
-          <p className="text-xs sm:text-sm text-granite leading-relaxed whitespace-pre-wrap break-words pl-[30px] line-clamp-3">
+          <p className="text-xs text-neutral-500 leading-relaxed whitespace-pre-wrap break-words line-clamp-2 mb-3">
             {task.description}
           </p>
         ) : (
-          <p className="text-xs italic text-slate-custom opacity-70 pl-[30px]">
+          <p className="text-xs text-neutral-400 italic mb-3">
             No description provided.
           </p>
         )}
+
+        {/* Meta / Date & Status Progress Row (matching reference image) */}
+        <div className="flex items-center justify-between gap-2 pt-1 mb-3">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-medium">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <span>ID #{task.id}</span>
+          </div>
+
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-full border ${prog.badge}`}>
+            <span aria-hidden="true">{prog.icon}</span>
+            <span>{prog.label}</span>
+          </span>
+        </div>
       </div>
 
-      {/* Card Footer: Task ID and Quick Status Selector */}
-      <div className="flex items-center justify-between pt-3 border-t border-black/5 flex-wrap gap-2 text-xs">
-        <span className="font-mono text-slate-custom text-[11px]">ID #{task.id}</span>
+      {/* Card Footer: Avatars + Meta counts + Quick actions */}
+      <div className="flex items-center justify-between pt-3 border-t border-neutral-100 flex-wrap gap-2">
+        {/* Colorful Avatar Stack like in Codomo screenshot */}
+        <div className="flex items-center -space-x-1.5">
+          <span className="w-5 h-5 rounded-full bg-emerald-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 1">👨🏽‍💻</span>
+          <span className="w-5 h-5 rounded-full bg-sky-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 2">🧔🏻</span>
+          <span className="w-5 h-5 rounded-full bg-amber-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 3">🧑🏾</span>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <label htmlFor={`quick-status-${task.id}`} className="sr-only">
-            Change status for task {task.title}
-          </label>
-          <select
-            id={`quick-status-${task.id}`}
-            className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/95 hover:bg-white border border-border-custom text-charcoal hover:border-ink hover:text-ink focus:outline-none focus:border-ink transition cursor-pointer disabled:opacity-60 shadow-2xs"
-            value={task.status}
-            disabled={isUpdating || isDeleting}
-            onChange={handleStatusChange}
-            title="Quickly change task status"
-          >
-            <option value="Todo">Todo</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
+        {/* Actions & Status selector */}
+        <div className="flex items-center gap-1.5 ml-auto">
+          <div>
+            <label htmlFor={`quick-status-${task.id}`} className="sr-only">
+              Change status for task {task.title}
+            </label>
+            <select
+              id={`quick-status-${task.id}`}
+              className="text-[11px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-neutral-900 cursor-pointer disabled:opacity-50"
+              value={selectedStatus}
+              disabled={isUpdating || isDeleting}
+              onChange={handleStatusChange}
+              title="Quickly change task status"
+            >
+              <option value="Todo">Todo</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+
+          {!showConfirmDelete ? (
+            <>
+              <button
+                type="button"
+                className="px-2 py-1 text-[11px] font-medium text-neutral-600 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                onClick={() => setIsEditing(true)}
+                disabled={isUpdating || isDeleting}
+                aria-label={`Edit task ${task.title}`}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-700 bg-red-50/60 hover:bg-red-50 border border-red-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                onClick={() => setShowConfirmDelete(true)}
+                disabled={isUpdating || isDeleting}
+                aria-label={`Delete task ${task.title}`}
+              >
+                Delete
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-1" role="group" aria-label="Confirm deletion">
+              <span className="text-[11px] font-semibold text-red-600">Delete?</span>
+              <button
+                type="button"
+                className="px-2 py-0.5 text-[11px] font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer disabled:opacity-50"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+              <button
+                type="button"
+                className="px-2 py-0.5 text-[11px] font-medium text-neutral-600 hover:text-neutral-800 bg-white border border-neutral-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                onClick={() => setShowConfirmDelete(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </li>
