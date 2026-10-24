@@ -20,7 +20,7 @@ const STATUS_PROGRESS = {
 }
 
 // Komponen kartu task: title, description, progress ring, avatars, dan actions.
-export default function TaskItem({
+export default function TaskCard({
   task,
   onUpdate,
   onDelete,

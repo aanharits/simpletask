@@ -1,4 +1,4 @@
-import TaskItem from './TaskItem'
+import TaskCard from './TaskCard'
 
 // Komponen grid responsif untuk menampilkan task langsung pada tab Todo, In Progress, atau Done.
 export default function TaskGrid({
@@ -15,7 +15,7 @@ export default function TaskGrid({
       aria-label={`${status} task grid`}
     >
       {tasks.map((task) => (
-        <TaskItem
+        <TaskCard
           key={task.id}
           task={task}
           onUpdate={onUpdate}

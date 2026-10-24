@@ -1,7 +1,7 @@
 import useTasks from './hooks/useTasks'
 import Header from './components/Header'
-import CreateTaskSection from './components/CreateTaskSection'
-import TaskList from './components/TaskList'
+import TaskCreatePanel from './components/TaskCreatePanel'
+import TaskBoard from './components/TaskBoard'
 import ToastContainer from './components/Toast'
 import Footer from './components/Footer'
 
@@ -50,7 +50,7 @@ export default function App() {
         />
 
         {/* Modular Collapsible Create Task Section */}
-        <CreateTaskSection
+        <TaskCreatePanel
           isOpen={isFormOpen}
           canClose={canHideForm}
           onClose={closeForm}
@@ -81,7 +81,7 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <TaskList
+            <TaskBoard
               tasks={displayedTasks}
               onUpdate={updateTask}
               onDelete={deleteTask}

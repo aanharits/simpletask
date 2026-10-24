@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import TaskItem from './TaskItem'
+import TaskCard from './TaskCard'
 
 // Komponen kolom Kanban pada tab Board dengan batasan maksimal 3 data dan kemampuan expand/collapse.
 export default function KanbanColumn({
@@ -68,7 +68,7 @@ export default function KanbanColumn({
         <div className="space-y-3">
           <ul className="space-y-3" aria-label={`${col.title} tasks`}>
             {displayedTasks.map((task) => (
-              <TaskItem
+              <TaskCard
                 key={task.id}
                 task={task}
                 onUpdate={onUpdate}

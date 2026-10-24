@@ -49,7 +49,7 @@ const KANBAN_COLUMNS = [
 ]
 
 // Komponen board layout utama: Board view dengan batasan 3 data & expand, serta status view dengan responsif grid.
-export default function TaskList({
+export default function TaskBoard({
   tasks,
   onUpdate,
   onDelete,

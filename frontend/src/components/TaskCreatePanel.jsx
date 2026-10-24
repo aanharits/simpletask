@@ -1,7 +1,7 @@
 import TaskForm from './TaskForm'
 
-// Komponen seksi pembuatan task dengan wrapper accordion transisi gulir (roll-down & roll-up).
-export default function CreateTaskSection({
+// Komponen panel pembuatan task dengan wrapper accordion transisi gulir (roll-down & roll-up).
+export default function TaskCreatePanel({
   isOpen = true,
   canClose = false,
   onClose,
