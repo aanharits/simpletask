@@ -78,13 +78,39 @@ export default function App() {
         
         {/* Top Navbar Header */}
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-neutral-200/70 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-neutral-900 flex items-center justify-center text-white text-sm font-bold shadow-xs">
-              ✓
+          <div className="flex items-center gap-3.5">
+            {/* Dual-tone Kanban Layers Icon */}
+            <div
+              className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white shadow-xs shrink-0"
+              aria-hidden="true"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1.5" className="fill-white stroke-white" />
+                <rect x="14" y="3" width="7" height="5" rx="1.5" className="fill-white/35 stroke-white/50" />
+                <rect x="14" y="12" width="7" height="9" rx="1.5" className="fill-white/70 stroke-white/85" />
+                <rect x="3" y="16" width="7" height="5" rx="1.5" className="fill-white/25 stroke-white/40" />
+              </svg>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight text-neutral-900">Simple Task</span>
+
+            {/* Breadcrumb Title & Metadata */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-medium text-neutral-400">Workspace</span>
+                <span className="text-xs text-neutral-300 select-none">/</span>
+                <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
+                  Simple Task
+                </h1>
+                <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-full font-mono">
+                  {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-neutral-400 font-medium mt-1">
+                <span className="inline-flex items-center gap-1.5 text-neutral-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                  PostgreSQL Connected
+                </span>
+                <span className="text-neutral-300">•</span>
+                <span>Sprint Board</span>
               </div>
             </div>
           </div>
