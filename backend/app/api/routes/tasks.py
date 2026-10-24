@@ -8,19 +8,21 @@ from app.services import task_service
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
+# endpoint untuk mengambil semua task
 @router.get("", response_model=list[TaskRead], status_code=status.HTTP_200_OK)
 def list_tasks(session: Session = Depends(get_session)) -> list[TaskRead]:
     tasks = task_service.get_tasks(session)
     return [TaskRead.model_validate(task) for task in tasks]
 
 
+# endpoint untuk membuat task baru
 @router.post("", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
 def create_task(task_in: TaskCreate, session: Session = Depends(get_session)) -> TaskRead:
     task = task_service.create_task(session, task_in)
     return TaskRead.model_validate(task)
 
 
-# Memperbarui sebagian atau seluruh field task berdasarkan ID.
+# endpoint untuk memperbarui sebagian atau seluruh field task berdasarkan ID
 @router.put("/{task_id}", response_model=TaskRead, status_code=status.HTTP_200_OK)
 def update_task(
     task_id: int,
@@ -38,7 +40,7 @@ def update_task(
     return TaskRead.model_validate(updated_task)
 
 
-# Menghapus task berdasarkan ID dan mengembalikan status 204 No Content.
+# endpoint untuk menghapus task berdasarkan ID
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int, session: Session = Depends(get_session)) -> Response:
     task = task_service.get_task_by_id(session, task_id)

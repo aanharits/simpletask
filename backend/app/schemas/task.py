@@ -1,9 +1,6 @@
 from typing import Optional
-
 from pydantic import BaseModel, Field, field_validator, model_validator
-
 from app.models.task import TaskStatus
-
 
 # Schema validasi payload untuk pembuatan task baru via POST /tasks.
 class TaskCreate(BaseModel):
@@ -30,7 +27,6 @@ class TaskCreate(BaseModel):
         if len(stripped) > 2000:
             raise ValueError("Description must not exceed 2000 characters.")
         return stripped
-
 
 # Schema validasi payload partial update via PUT /tasks/{task_id}.
 class TaskUpdate(BaseModel):
@@ -71,7 +67,6 @@ class TaskUpdate(BaseModel):
         if len(stripped) > 2000:
             raise ValueError("Description must not exceed 2000 characters.")
         return stripped
-
 
 # Schema response task yang dikembalikan ke client dengan dukungan atribut ORM.
 class TaskRead(BaseModel):

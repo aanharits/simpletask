@@ -53,7 +53,7 @@ export default function TaskItem({
     }
   }
 
-  // Mengeksekusi penghapusan task setelah konfirmasi pengguna disetujui.
+  // Mengeksekusi penghapusan task 
   const handleDelete = async () => {
     setItemError('')
     try {
