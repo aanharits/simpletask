@@ -166,14 +166,9 @@ export default function TaskItem({
         </div>
       </div>
 
-      {/* Card Footer: Avatars + Meta counts + Quick actions */}
+      {/* Card Footer: Status selector & Actions */}
       <div className="flex items-center justify-between pt-3 border-t border-neutral-100 flex-wrap gap-2">
-        {/* Colorful Avatar Stack like in Codomo screenshot */}
-        <div className="flex items-center -space-x-1.5">
-          <span className="w-5 h-5 rounded-full bg-emerald-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 1">👨🏽‍💻</span>
-          <span className="w-5 h-5 rounded-full bg-sky-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 2">🧔🏻</span>
-          <span className="w-5 h-5 rounded-full bg-amber-100 border border-white text-[10px] flex items-center justify-center" title="Assignee 3">🧑🏾</span>
-        </div>
+        <span className="text-[11px] font-mono text-neutral-400">ID #{task.id}</span>
 
         {/* Actions & Status selector */}
         <div className="flex items-center gap-1.5 ml-auto">

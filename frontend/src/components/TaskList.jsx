@@ -4,7 +4,7 @@ import TaskItem from './TaskItem'
 const KANBAN_COLUMNS = [
   {
     id: 'Todo',
-    title: 'Planned',
+    title: 'Todo',
     badgeText: 'Todo',
     icon: (
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500">
@@ -12,7 +12,7 @@ const KANBAN_COLUMNS = [
         <circle cx="12" cy="12" r="3" />
       </svg>
     ),
-    emptyText: 'No planned tasks',
+    emptyText: 'No tasks to do',
   },
   {
     id: 'In Progress',
