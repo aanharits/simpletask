@@ -54,28 +54,25 @@ export default function TaskForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
       {error && (
         <div
-          className="flex items-center gap-2 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg animate-in fade-in"
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-error-bg text-error-text border border-error-border rounded-[10px]"
           role="alert"
         >
-          <span className="inline-block w-2 h-2 rounded-full bg-red-500 shrink-0" aria-hidden="true" />
-          <span className="font-medium">{error}</span>
+          <span className="text-signal-orange text-lg leading-none" aria-hidden="true">•</span>
+          <span>{error}</span>
         </div>
       )}
 
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <label htmlFor={`${idPrefix}-title`} className="text-xs font-semibold uppercase tracking-wider text-slate-600">
-            Title <span className="text-red-500" aria-hidden="true">*</span>
-          </label>
-          <span className="text-[11px] font-mono text-slate-400">{title.length}/120</span>
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={`${idPrefix}-title`} className="text-sm font-semibold text-charcoal flex items-center gap-1">
+          Title <span className="text-signal-orange" aria-hidden="true">*</span>
+        </label>
         <input
           id={`${idPrefix}-title`}
           type="text"
-          className="w-full px-3.5 py-2.5 text-sm text-slate-800 bg-white border border-slate-300 rounded-lg shadow-2xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition disabled:bg-slate-50 disabled:text-slate-400"
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition disabled:bg-canvas/50"
           placeholder="e.g. Design API specification"
           value={title}
           maxLength={120}
@@ -86,34 +83,33 @@ export default function TaskForm({
           }}
           required
         />
+        <span className="text-[11px] text-slate-custom self-end">{title.length}/120</span>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <label htmlFor={`${idPrefix}-description`} className="text-xs font-semibold uppercase tracking-wider text-slate-600">
-            Description <span className="text-slate-400 font-normal lowercase tracking-normal">(optional)</span>
-          </label>
-          <span className="text-[11px] font-mono text-slate-400">{description.length}/2000</span>
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={`${idPrefix}-description`} className="text-sm font-semibold text-charcoal flex items-center gap-1">
+          Description <span className="text-xs font-normal text-slate-custom">(optional)</span>
+        </label>
         <textarea
           id={`${idPrefix}-description`}
-          className="w-full px-3.5 py-2.5 text-sm text-slate-800 bg-white border border-slate-300 rounded-lg shadow-2xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition resize-y min-h-[88px] disabled:bg-slate-50 disabled:text-slate-400"
-          placeholder="Add any extra context, acceptance criteria, or requirements..."
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition resize-y min-h-[80px] disabled:bg-canvas/50"
+          placeholder="Add any extra context or requirements..."
           value={description}
           maxLength={2000}
           rows={3}
           disabled={isSubmitting}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <span className="text-[11px] text-slate-custom self-end">{description.length}/2000</span>
       </div>
 
-      <div>
-        <label htmlFor={`${idPrefix}-status`} className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={`${idPrefix}-status`} className="text-sm font-semibold text-charcoal">
           Status
         </label>
         <select
           id={`${idPrefix}-status`}
-          className="w-full px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white border border-slate-300 rounded-lg shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition disabled:bg-slate-50 disabled:text-slate-400 cursor-pointer"
+          className="w-full bg-white border border-taupe rounded-xl px-4 py-3 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-3 focus:ring-signal-orange/20 transition disabled:bg-canvas/50 cursor-pointer"
           value={status}
           disabled={isSubmitting}
           onChange={(e) => setStatus(e.target.value)}
@@ -124,25 +120,18 @@ export default function TaskForm({
         </select>
       </div>
 
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
         <button
           type="submit"
-          className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 active:bg-slate-950 rounded-lg shadow-xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-full text-[15px] font-semibold bg-ink text-canvas border-[1.5px] border-ink hover:bg-charcoal hover:border-charcoal active:scale-[0.98] transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed min-h-[42px]"
           disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Saving...
-            </span>
-          ) : (
-            buttonText
-          )}
+          {isSubmitting ? 'Saving...' : buttonText}
         </button>
         {onCancel && (
           <button
             type="button"
-            className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-full text-[15px] font-semibold bg-white text-ink border-[1.5px] border-taupe hover:border-ink active:scale-[0.98] transition cursor-pointer disabled:opacity-60 min-h-[42px]"
             onClick={onCancel}
             disabled={isSubmitting}
           >
