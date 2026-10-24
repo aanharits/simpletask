@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import useTasks from './hooks/useTasks'
 import useToast from './hooks/useToast'
-import TaskForm from './components/TaskForm'
+import Header from './components/Header'
+import CreateTaskSection from './components/CreateTaskSection'
 import TaskList from './components/TaskList'
 import ToastContainer from './components/Toast'
+import Footer from './components/Footer'
 
-// Komponen halaman utama Simple Task: clean, modern, minimalist dashboard tanpa sidebar.
+// Komponen root Simple Task: bertindak sebagai controller / orchestrator halaman utama.
 export default function App() {
   const {
     tasks,
@@ -30,7 +32,7 @@ export default function App() {
   const [showCreateForm, setShowCreateForm] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Sinkronkan notifikasi sukses atau error ke modul toaster
+  // Sinkronkan notifikasi sukses atau error ke modul toaster mengambang
   useEffect(() => {
     if (actionSuccess) {
       showSuccess(actionSuccess)
@@ -45,7 +47,7 @@ export default function App() {
     }
   }, [actionError, showError, clearActionError])
 
-  // Jika belum ada data sama sekali, form wajib selalu terbuka dan tidak bisa di-hide.
+  // Form wajib selalu terbuka jika belum ada task sama sekali
   const hasTasks = tasks.length > 0
   const isFormOpen = !hasTasks || showCreateForm
 
@@ -75,124 +77,26 @@ export default function App() {
 
       {/* Main Clean Card Frame */}
       <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-neutral-200/70 overflow-hidden flex flex-col p-5 sm:p-8 min-h-[800px]">
-        
-        {/* Top Navbar Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-neutral-200/70 mb-6">
-          <div className="flex items-center gap-3.5">
-            {/* Dual-tone Kanban Layers Icon */}
-            <div
-              className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white shadow-xs shrink-0"
-              aria-hidden="true"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="9" rx="1.5" className="fill-white stroke-white" />
-                <rect x="14" y="3" width="7" height="5" rx="1.5" className="fill-white/35 stroke-white/50" />
-                <rect x="14" y="12" width="7" height="9" rx="1.5" className="fill-white/70 stroke-white/85" />
-                <rect x="3" y="16" width="7" height="5" rx="1.5" className="fill-white/25 stroke-white/40" />
-              </svg>
-            </div>
+        {/* Modular Navbar Header */}
+        <Header
+          taskCount={tasks.length}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          canHideForm={hasTasks}
+          isFormOpen={isFormOpen}
+          onToggleForm={() => setShowCreateForm(!isFormOpen)}
+        />
 
-            {/* Breadcrumb Title & Metadata */}
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-medium text-neutral-400">Workspace</span>
-                <span className="text-xs text-neutral-300 select-none">/</span>
-                <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
-                  Simple Task
-                </h1>
-                <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-full font-mono">
-                  {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-[11px] text-neutral-400 font-medium mt-1">
-                <span className="inline-flex items-center gap-1.5 text-neutral-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-                  PostgreSQL Connected
-                </span>
-                <span className="text-neutral-300">•</span>
-                <span>Sprint Board</span>
-              </div>
-            </div>
-          </div>
+        {/* Modular Collapsible Create Task Section */}
+        <CreateTaskSection
+          isOpen={isFormOpen}
+          canClose={hasTasks}
+          onClose={() => setShowCreateForm(false)}
+          onSubmit={createTask}
+          isSubmitting={isCreating}
+        />
 
-          <div className="flex items-center gap-2.5">
-            {/* Search tasks input with smooth expansion */}
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-7 py-1.5 text-xs bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 w-40 sm:w-52 focus:w-48 sm:focus:w-60 transition-all duration-200 ease-out shadow-2xs"
-              />
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="absolute left-2.5 text-neutral-400 pointer-events-none">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 text-neutral-400 hover:text-neutral-700 text-xs font-bold hover:scale-110 active:scale-95 transition-all duration-150 cursor-pointer animate-pop-in"
-                  aria-label="Clear search"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            {/* Toggle Create Form Button: hanya muncul jika sudah ada data task */}
-            {hasTasks && (
-              <button
-                type="button"
-                onClick={() => setShowCreateForm(!isFormOpen)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
-              >
-                <span>{isFormOpen ? '− Hide Form' : '+ New Task'}</span>
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* Create Task Card with smooth accordion roll-down & roll-up animation */}
-        <div className={`form-accordion ${isFormOpen ? 'is-open' : ''}`}>
-          <div className="form-accordion-inner">
-            <section
-              className="bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs"
-              aria-labelledby="create-task-heading"
-            >
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
-                <div>
-                  <h2 id="create-task-heading" className="text-sm font-bold text-neutral-900">
-                    Create a Task
-                  </h2>
-                  <p className="text-xs text-neutral-500">
-                    Add a new task item with title, optional description, and status.
-                  </p>
-                </div>
-                {/* Tombol Close hanya muncul jika sudah ada data task */}
-                {hasTasks && (
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateForm(false)}
-                    className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer"
-                  >
-                    Close
-                  </button>
-                )}
-              </div>
-
-              <TaskForm
-                onSubmit={createTask}
-                isSubmitting={isCreating}
-                buttonText="Create Task"
-                idPrefix="create-task"
-              />
-            </section>
-          </div>
-        </div>
-
-        {/* Main Board Section */}
+        {/* Main Board & Tasks Section */}
         <section className="flex-1" aria-labelledby="task-list-heading">
           <h2 id="task-list-heading" className="sr-only">Tasks</h2>
 
@@ -228,11 +132,8 @@ export default function App() {
           )}
         </section>
 
-        {/* Minimal Footer */}
-        <footer className="pt-6 mt-8 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-400">
-          <span>Simple Task • Technical Test Intern Software Engineer</span>
-          <span>Farhan Harits Prakoso</span>
-        </footer>
+        {/* Modular Footer */}
+        <Footer />
       </div>
     </div>
   )
