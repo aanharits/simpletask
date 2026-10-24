@@ -5,35 +5,41 @@ export function ToastItem({ toast, onDismiss }) {
   return (
     <div
       role={isSuccess ? 'status' : 'alert'}
-      className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-2xl border shadow-[0_12px_32px_rgba(0,0,0,0.08)] bg-white/95 backdrop-blur-md animate-slide-down transition-all duration-200 ${
-        isSuccess
-          ? 'border-emerald-200/90 text-neutral-800'
-          : 'border-red-200/90 text-neutral-800'
-      }`}
+      className="pointer-events-auto flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.08)] animate-slide-down transition-all duration-200 ease-out"
       data-toast-id={toast.id}
     >
-      {/* Icon Badge */}
+      {/* Icon Badge - selaras dengan logo Simple Task */}
       <div
-        className={`w-6 h-6 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
+        className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
           isSuccess
-            ? 'bg-emerald-50 border border-emerald-200 text-emerald-600'
-            : 'bg-red-50 border border-red-200 text-red-600'
+            ? 'bg-neutral-900 text-white'
+            : 'bg-red-600 text-white'
         }`}
         aria-hidden="true"
       >
-        {isSuccess ? '✓' : '!'}
+        {isSuccess ? (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          <span className="text-xs font-bold leading-none">!</span>
+        )}
       </div>
 
       {/* Content Text */}
       <div className="flex-1 min-w-0 pt-0.5">
-        <h4
-          className={`text-xs font-bold leading-none mb-1 ${
-            isSuccess ? 'text-emerald-900' : 'text-red-900'
-          }`}
-        >
-          {isSuccess ? 'Success' : 'Notice'}
-        </h4>
-        <p className="text-xs text-neutral-600 leading-relaxed break-words font-medium">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              isSuccess ? 'bg-emerald-500' : 'bg-red-500'
+            }`}
+            aria-hidden="true"
+          />
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 leading-none">
+            {isSuccess ? 'Success' : 'Notice'}
+          </h4>
+        </div>
+        <p className="text-xs font-semibold text-neutral-900 leading-relaxed break-words">
           {toast.message}
         </p>
       </div>
@@ -42,10 +48,10 @@ export function ToastItem({ toast, onDismiss }) {
       <button
         type="button"
         onClick={() => onDismiss(toast.id)}
-        className="text-neutral-400 hover:text-neutral-700 hover:scale-110 active:scale-95 text-base leading-none p-1 rounded-lg transition-all duration-150 cursor-pointer shrink-0"
+        className="text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 active:scale-95 w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer shrink-0"
         aria-label="Dismiss notification"
       >
-        ×
+        <span className="text-base leading-none">×</span>
       </button>
     </div>
   )
