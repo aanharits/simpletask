@@ -105,9 +105,9 @@ export default function TaskBoard({
   return (
     <div className="space-y-5">
       {/* View Switcher Tabs & Filter Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div
-          className="inline-flex items-center p-1 bg-[#EBE9E6] rounded-xl border border-neutral-200/60 shadow-2xs overflow-x-auto"
+          className="w-full sm:w-auto flex items-center p-1 bg-[#EBE9E6] rounded-xl border border-neutral-200/60 shadow-2xs overflow-x-auto no-scrollbar"
           role="group"
           aria-label="Filter tasks by status"
         >
@@ -120,7 +120,7 @@ export default function TaskBoard({
               <button
                 key={filter}
                 type="button"
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap ${
                   isSelected
                     ? 'bg-white text-neutral-900 shadow-xs'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/50'
@@ -158,44 +158,51 @@ export default function TaskBoard({
           </button>
         </div>
       ) : activeFilter === 'All' ? (
-        /* Tab Board: 3 Kolom dengan batasan 3 data per kolom + Expand toggle */
-        <div key="board-view" className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start animate-fade-in">
+        /* Tab Board: Horizontal Snap Scroll on Mobile, 3-column Grid on Desktop */
+        <div
+          key="board-view"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-3.5 pb-4 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible items-start animate-fade-in no-scrollbar"
+        >
           {KANBAN_COLUMNS.map((col) => {
             const columnTasks = tasks.filter((t) => t.status === col.id)
             const isOver = dragOverCol === col.id
 
             return (
-              <KanbanColumn
+              <div
                 key={col.id}
-                col={col}
-                tasks={columnTasks}
-                onUpdate={onUpdate}
-                onDelete={onDelete}
-                updatingTaskId={updatingTaskId}
-                deletingTaskId={deletingTaskId}
-                isOver={isOver}
-                initialLimit={3}
-                onOpenCreate={onOpenCreate}
-                onDragOver={(e) => {
-                  e.preventDefault()
-                  e.dataTransfer.dropEffect = 'move'
-                  if (dragOverCol !== col.id) setDragOverCol(col.id)
-                }}
-                onDragLeave={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                className="w-[85vw] max-w-[340px] sm:w-auto sm:max-w-none shrink-0 sm:shrink snap-center"
+              >
+                <KanbanColumn
+                  col={col}
+                  tasks={columnTasks}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
+                  updatingTaskId={updatingTaskId}
+                  deletingTaskId={deletingTaskId}
+                  isOver={isOver}
+                  initialLimit={3}
+                  onOpenCreate={onOpenCreate}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    if (dragOverCol !== col.id) setDragOverCol(col.id)
+                  }}
+                  onDragLeave={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) {
+                      setDragOverCol(null)
+                    }
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault()
                     setDragOverCol(null)
-                  }
-                }}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  setDragOverCol(null)
-                  const idStr = e.dataTransfer.getData('text/plain')
-                  const taskId = Number(idStr)
-                  if (taskId && !isNaN(taskId)) {
-                    onUpdate(taskId, { status: col.id }, { silent: true })
-                  }
-                }}
-              />
+                    const idStr = e.dataTransfer.getData('text/plain')
+                    const taskId = Number(idStr)
+                    if (taskId && !isNaN(taskId)) {
+                      onUpdate(taskId, { status: col.id }, { silent: true })
+                    }
+                  }}
+                />
+              </div>
             )
           })}
         </div>

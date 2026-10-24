@@ -33,12 +33,12 @@ export default function App() {
   } = useTasks()
 
   return (
-    <div className="min-h-screen bg-[#ECEAE7] p-3 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
+    <div className="min-h-screen bg-[#ECEAE7] p-0 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
       {/* Floating Toaster Container */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Main Clean Card Frame */}
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-neutral-200/70 overflow-hidden flex flex-col p-5 sm:p-8 min-h-[800px]">
+      <div className="w-full max-w-6xl bg-white rounded-none sm:rounded-3xl shadow-none sm:shadow-[0_12px_40px_rgba(0,0,0,0.06)] border-0 sm:border border-neutral-200/70 overflow-hidden flex flex-col p-4 sm:p-8 min-h-screen sm:min-h-[800px]">
         {/* Modular Navbar Header */}
         <Header
           taskCount={tasks.length}

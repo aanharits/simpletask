@@ -12,15 +12,15 @@ export default function TaskCreatePanel({
     <div className={`form-accordion ${isOpen ? 'is-open' : ''}`}>
       <div className="form-accordion-inner">
         <section
-          className="bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs"
+          className="bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-3.5 sm:p-5 shadow-2xs mb-4 sm:mb-6"
           aria-labelledby="create-task-heading"
         >
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200/60">
+          <div className="flex items-center justify-between pb-2.5 sm:pb-3 mb-2.5 sm:mb-3 border-b border-neutral-200/60">
             <div>
-              <h2 id="create-task-heading" className="text-sm font-bold text-neutral-900">
+              <h2 id="create-task-heading" className="text-xs sm:text-sm font-bold text-neutral-900">
                 Create a Task
               </h2>
-              <p className="text-xs text-neutral-500">
+              <p className="text-[11px] sm:text-xs text-neutral-500">
                 Add a new task item with title, optional description, and status.
               </p>
             </div>
@@ -29,7 +29,7 @@ export default function TaskCreatePanel({
               <button
                 type="button"
                 onClick={onClose}
-                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 text-xs font-medium hover:scale-105 active:scale-95 transition-all duration-150 cursor-pointer p-1"
               >
                 Close
               </button>

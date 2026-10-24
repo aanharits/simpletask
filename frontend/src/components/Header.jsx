@@ -8,33 +8,31 @@ export default function Header({
   onToggleForm,
 }) {
   return (
-    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-neutral-200/70 mb-6">
+    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-4 sm:pb-5 border-b border-neutral-200/70 mb-4 sm:mb-6">
       {/* Breadcrumb Title & Task Count Badge */}
-      <div className="flex items-center gap-3.5">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs font-medium text-neutral-400">Workspace</span>
-            <span className="text-xs text-neutral-300 select-none">/</span>
-            <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
-              Simple Task
-            </h1>
-            <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-full font-mono">
-              {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
-            </span>
-          </div>
+      <div className="flex items-center justify-between sm:justify-start gap-2.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="hidden sm:inline text-xs font-medium text-neutral-400">Workspace</span>
+          <span className="hidden sm:inline text-xs text-neutral-300 select-none">/</span>
+          <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
+            Simple Task
+          </h1>
+          <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold text-neutral-600 bg-neutral-100 border border-neutral-200/80 rounded-full font-mono">
+            {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
+          </span>
         </div>
       </div>
 
       {/* Right Controls: Search & Toggle Form Button */}
-      <div className="flex items-center gap-2.5">
-        {/* Search input with smooth expansion */}
-        <div className="relative flex items-center">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Search input with responsive width */}
+        <div className="relative flex-1 sm:flex-initial flex items-center">
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-8 pr-7 py-1.5 text-xs bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 w-40 sm:w-52 focus:w-48 sm:focus:w-60 transition-all duration-200 ease-out shadow-2xs"
+            className="pl-8 pr-7 py-1.5 text-xs bg-neutral-100/80 hover:bg-neutral-100 focus:bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 w-full sm:w-52 sm:focus:w-60 transition-all duration-200 ease-out shadow-2xs"
           />
           <svg
             width="13"
@@ -65,7 +63,7 @@ export default function Header({
           <button
             type="button"
             onClick={onToggleForm}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer shrink-0"
           >
             <span>{isFormOpen ? '− Hide Form' : '+ New Task'}</span>
           </button>

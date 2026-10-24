@@ -47,7 +47,7 @@ export default function ToastContainer({ toasts = [], onDismiss }) {
 
   return (
     <div
-      className="fixed top-5 right-5 sm:top-6 sm:right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"
+      className="fixed top-3 left-3 right-3 sm:left-auto sm:top-6 sm:right-6 sm:max-w-sm z-50 flex flex-col gap-2 pointer-events-none"
       aria-live="polite"
     >
       {toasts.map((toast) => (

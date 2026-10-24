@@ -118,3 +118,13 @@
 .form-accordion.is-open .form-accordion-inner {
   transform: translateY(0);
 }
+
+/* Hide scrollbar for smooth mobile gestures */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
