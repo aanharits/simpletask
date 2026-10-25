@@ -1,76 +1,71 @@
-# Simple Task/Project Tracker
+# SimpleTask
 
-A full-stack, accessible CRUD application built as a technical assessment deliverable for the **Full-Stack Developer Intern (Python + React)** role.
+Aplikasi task management full-stack berbasis FastAPI (Python 3.9+) dan React 19 (Vite) dengan database persisten PostgreSQL 17.
 
-The application allows users to create tasks, track progress across distinct statuses (`Todo`, `In Progress`, `Done`), edit details in-place, filter tasks, and delete completed deliverables without page reloads. Data is persistently stored in **PostgreSQL 17** via **SQLModel** and **FastAPI**, with a responsive **React (Vite)** frontend styled using a warm editorial design system inspired by GetDesign tokens.
-
----
-
-## Features
-
-- **Full-Stack CRUD:** Create, list, partially update (title, description, or status), and delete tasks.
-- **Persistent Storage:** Backed by PostgreSQL 17 running in Docker/OrbStack.
-- **Automatic Initialization:** Database tables and constraints are created automatically upon backend startup via FastAPI lifespan.
-- **Zero Page Reload:** Reactive UI updates state immediately upon server confirmation.
-- **Strict Validation:** Non-empty trimmed title requirement, character limits (120 chars for title, 2000 chars for description), and strict enum enforcement for status (`Todo`, `In Progress`, `Done`).
-- **Resilient Error Handling:** Prevents double-submission, displays user-friendly field-level validation errors, and handles connection interruptions gracefully.
-- **Clean Design System:** Warm editorial aesthetic (`#F3F0EE` Canvas Cream, `#141413` Ink Black, stadium pill buttons, accessible WCAG 2.2 AA contrast) inspired by the GetDesign Mastercard reference without proprietary branding.
-- **Accessible & Responsive:** Semantic HTML, screen-reader labels, visible keyboard focus rings, and seamless layout adaptation from 360px mobile viewports to desktop.
+Aplikasi ini mencakup alur CRUD tugas secara penuh (`Todo`, `In Progress`, `Done`), pencarian responsif, pengeditan in-place, konfirmasi penghapusan aman, serta antarmuka Kanban board responsif untuk desktop dan mobile.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Details |
-|---|---|---|
-| **Frontend** | React 19 + Vite + Axios | JavaScript template, Axios HTTP client with baseURL & error normalization |
-| **Styling** | Vanilla CSS + Design Tokens | Custom properties (`:root`), stadium radii, responsive media queries |
-| **Frontend Tests** | Vitest + React Testing Library | DOM testing with `@testing-library/jest-dom` and `jsdom` |
-| **Backend** | Python 3.9+ / FastAPI | Async framework with REST routing and dependency injection |
-| **ORM & Database Driver** | SQLModel + Psycopg 3 | Python models mapped to PostgreSQL tables via SQLAlchemy core |
-| **Validation & Settings** | Pydantic v2 + Pydantic Settings | Explicit schemas, field validators, `.env` file loading |
-| **Backend Tests & Lint** | pytest + HTTPX / TestClient, Ruff | Unit tests, PostgreSQL integration tests, formatting checks |
-| **Database** | PostgreSQL 17 (Alpine) | Containerized via Docker Compose / OrbStack with named volume |
+| Layer | Teknologi | Keterangan |
+| :--- | :--- | :--- |
+| **Frontend** | React 19, Vite, Axios | Single Page Application (SPA), Pure Presenter Component, Axios Client dengan normalisasi error terpusat |
+| **Styling** | Tailwind CSS v4, CSS Tokens | Utility-first styling framework v4, transisi form accordion, dan layout Kanban responsif |
+| **Backend** | Python 3.9+, FastAPI | Framework web async berkecepatan tinggi dengan dokumentasi OpenAPI/Swagger otomatis di `/docs` |
+| **ORM & Driver** | SQLModel, Psycopg 3 | Abstraksi model database berbasis SQLAlchemy Core/ORM dan Pydantic v2 dengan connection pooling |
+| **Database** | PostgreSQL 17 Alpine | Database relasional persisten via Docker Compose (OrbStack / Docker Engine) |
+| **Testing** | Vitest, Testing Library, pytest | Test suite otomatis: 38 frontend tests dan 42 backend tests |
+| **Linter** | ESLint, Ruff | Pemeliharaan standar kode statis JavaScript dan Python |
 
 ---
 
-## Prerequisites
+## Mengapa Memilih Pendekatan Docker Compose untuk PostgreSQL 17?
 
-Ensure the following tools are installed on your machine:
-- **Node.js**: v20+ / v22 LTS (tested on v25.7) & `npm` (v11+)
-- **Python**: 3.9+ (3.12 recommended; tested on 3.9.6)
-- **Docker & Docker Compose**: Docker Engine / OrbStack running on your system
+Database PostgreSQL 17 dijalankan menggunakan Docker Compose (`compose.yaml`) via Docker Engine atau OrbStack karena beberapa alasan utama:
+
+1. **Isolasi Lingkungan Bersih:** Tidak memerlukan instalasi database server PostgreSQL secara manual di mesin lokal host. Hal ini mencegah konflik versi PostgreSQL, port service yang bertabrakan, maupun residu konfigurasi lokal.
+2. **Reproducible (*Works on My Machine* Solved):** Memberikan jaminan 100% bahwa lingkungan database yang dijalankan oleh pengembang dan reviewer adalah versi yang sama persis (`postgres:17-alpine`), baik saat dijalankan di macOS (via OrbStack / Docker Desktop), Linux, maupun Windows.
+3. **Persistensi Data & Kemudahan Reset:** Menggunakan Docker named volume (`postgres_data`) sehingga data task tetap tersimpan aman saat container dihentikan atau di-restart. Untuk me-reset database ke kondisi awal yang bersih, cukup gunakan flag `-v`.
+4. **Healthcheck Otomatis:** Konfigurasi `compose.yaml` menyertakan probe healthcheck bawaan (`pg_isready`) untuk memastikan layanan database siap menerima koneksi sebelum server backend dihubungkan.
+5. **Kemudahan Menjalankan Aplikasi:** Reviewer tidak perlu mengkonfigurasi user, password, dan database secara manual via psql. Cukup satu perintah sederhana untuk menyiapkan seluruh infrastruktur database.
 
 ---
 
-## Getting Started
+## Prasyarat Sistem
 
-### 1. Clone & Setup Environment Files
+Pastikan perangkat Anda telah terpasang:
+- **Node.js**: v20+ / v22 LTS & `npm`
+- **Python**: 3.9+ (disarankan 3.11 atau 3.12)
+- **Docker & Docker Compose**: Docker Engine atau OrbStack
+
+---
+
+## Panduan Memulai Cepat (Quickstart)
+
+### 1. Salin Berkas Konfigurasi Lingkungan
 
 ```bash
-git clone <repository-url>
-cd simpletask
-
-# Copy backend environment template
+# Salin template environment backend
 cp backend/.env.example backend/.env
 
-# Copy frontend environment template
+# Salin template environment frontend
 cp frontend/.env.example frontend/.env
 ```
 
-> **Note:** The default credentials in `backend/.env` work out-of-the-box for local development with the provided `compose.yaml`.
+> Kredensial default pada `backend/.env` sudah disesuaikan agar langsung berfungsi dengan konfigurasi `compose.yaml`.
 
 ---
 
-### 2. Start PostgreSQL Database
+### 2. Jalankan Database PostgreSQL
 
-From the project root:
+Dari root direktori project:
 
 ```bash
 docker compose --env-file backend/.env up -d db
 ```
 
-Verify that the database container is healthy:
+Periksa status container untuk memastikan database berstatus healthy:
 
 ```bash
 docker compose --env-file backend/.env ps
@@ -78,41 +73,41 @@ docker compose --env-file backend/.env ps
 
 ---
 
-### 3. Setup and Start Backend API
+### 3. Jalankan Backend API Service
 
-Navigate to the `backend/` directory, create a virtual environment, install dependencies, and start the FastAPI server:
+Buka terminal dan navigasikan ke folder `backend`:
 
 ```bash
 cd backend
 
-# Create and activate Python virtual environment
+# Buat dan aktifkan virtual environment Python
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Upgrade pip and install dependencies
-python -m pip install -r requirements-dev.txt
+# Install dependensi
+pip install -r requirements-dev.txt
 
-# Start FastAPI development server
+# Jalankan server backend FastAPI
 uvicorn app.main:app --reload --port 8000
 ```
 
-- **API Base URL:** `http://localhost:8000`
-- **Interactive OpenAPI Documentation:** `http://localhost:8000/docs`
-- **Health Check Probe:** `http://localhost:8000/health`
+- **Backend API URL:** `http://localhost:8000`
+- **Dokumentasi Swagger UI:** `http://localhost:8000/docs`
+- **Health Check Endpoint:** `http://localhost:8000/health`
 
 ---
 
-### 4. Setup and Start Frontend Application
+### 4. Jalankan Frontend Client
 
-In a separate terminal window, navigate to the `frontend/` directory, install dependencies, and start the Vite dev server:
+Buka terminal baru dan navigasikan ke folder `frontend`:
 
 ```bash
 cd frontend
 
-# Install Node dependencies
+# Install dependensi Node
 npm install
 
-# Start Vite dev server
+# Jalankan Vite development server
 npm run dev
 ```
 
@@ -120,120 +115,67 @@ npm run dev
 
 ---
 
-## API Contract
+## Kontrak REST API
 
-All task routes are prefixed under `/tasks`:
+Seluruh endpoint tugas berada di bawah rute `/tasks`:
 
-| Method | Endpoint | Description | Status Code |
-|---|---|---|---|
-| `GET` | `/tasks` | List all tasks ordered deterministically by ID ascending | `200 OK` |
-| `POST` | `/tasks` | Create a new task (body: `TaskCreate`) | `201 Created` |
-| `PUT` | `/tasks/{id}` | Partially update task fields (body: `TaskUpdate`) | `200 OK`, `404 Not Found` |
-| `DELETE` | `/tasks/{id}` | Delete task by ID | `204 No Content`, `404 Not Found` |
-
-### Sample Schemas
-
-#### Request: Create Task (`POST /tasks`)
-```json
-{
-  "title": "Build technical assessment deliverable",
-  "description": "Implement backend and frontend with automated tests",
-  "status": "Todo"
-}
-```
-
-#### Request: Partial Update (`PUT /tasks/{id}`)
-```json
-{
-  "status": "In Progress"
-}
-```
-
-#### Response: Task Object
-```json
-{
-  "id": 1,
-  "title": "Build technical assessment deliverable",
-  "description": "Implement backend and frontend with automated tests",
-  "status": "In Progress"
-}
-```
+| Method | Endpoint | Deskripsi | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/tasks` | Mengambil seluruh daftar task (terurut ascending berdasarkan ID) | `200 OK` |
+| `POST` | `/tasks` | Membuat task baru (payload: `TaskCreate`) | `201 Created` |
+| `PUT` | `/tasks/{id}` | Memperbarui field task secara parsial (payload: `TaskUpdate`) | `200 OK`, `404 Not Found` |
+| `DELETE` | `/tasks/{id}` | Menghapus task berdasarkan ID | `204 No Content`, `404 Not Found` |
 
 ---
 
-## Automated Testing & Quality Checks
+## Pengujian Otomatis & Kualitas Kode
 
 ### Backend Tests & Linting
-Run from the `backend/` directory with `.venv` active:
+Jalankan dari direktori `backend/` dengan virtual environment aktif:
 
 ```bash
 cd backend
 source .venv/bin/activate
 
-# Run full test suite (unit + PostgreSQL integration tests)
-python -m pytest tests/ -v
+# Menjalankan seluruh test suite (42 tests)
+pytest tests/ -v
 
-# Run code style and lint check with Ruff
+# Memeriksa standar kode dan format dengan Ruff
 ruff check .
-
-# Check code formatting with Ruff
 ruff format --check .
 ```
 
-*Results:* **42 tests passed** (schema validation, check constraints, database session lifecycle, error handling, and CRUD endpoints).
+*Status:* **42 tests passed** (mencakup validasi schema Pydantic, database check constraints, session lifecycle, dan endpoint REST API).
 
 ### Frontend Tests & Linting
-Run from the `frontend/` directory:
+Jalankan dari direktori `frontend/`:
 
 ```bash
 cd frontend
 
-# Run component and workflow tests with Vitest
+# Menjalankan seluruh test suite Vitest (38 tests)
 npm test
 
-# Run ESLint check
+# Memeriksa linter ESLint
 npm run lint
 
-# Verify production bundle build
+# Memvalidasi hasil build bundle produksi
 npm run build
 ```
 
-*Results:* **9 tests passed** (initial load, empty state, form validation, mutation without reload, quick status updates, in-place editing, filtering tabs, deletion confirmation, and network error handling).
+*Status:* **38 tests passed** (mencakup Axios client, hook `useTasks`, hook `useToast`, rendering komponen, interaksi form, dan skenario CRUD lengkap di `App.test.jsx`).
 
 ---
 
-## Architecture & Design Decisions
+## Menghentikan Database
 
-### 1. Database Model vs. API Schemas
-- **`app/models/task.py`** defines the SQLModel table schema with PostgreSQL-level check constraints (`length(trim(title)) > 0` and status membership).
-- **`app/schemas/task.py`** defines separate Pydantic models for incoming requests (`TaskCreate`, `TaskUpdate`) and responses (`TaskRead`). This prevents ORM internals or database state from leaking into API contracts and allows granular input validation (e.g. rejecting explicit `null` on required fields).
-
-### 2. Session Lifecycle Dependency Injection
-- Database sessions are created per-request via FastAPI's `Depends(get_session)`.
-- Using Python's `yield`, each session is cleanly closed when the HTTP response finishes, preventing connection leaks.
-
-### 3. Startup Table Initialization
-- `SQLModel.metadata.create_all(engine)` is executed inside FastAPI's async `lifespan` handler upon application startup.
-- *Trade-off:* While optimal for rapid setup in single-entity assessments without manual migration scripts, production applications with evolving schemas would use Alembic for version-controlled schema migrations.
-
-### 4. CORS Whitelisting
-- CORS is restricted to the development origin (`http://localhost:5173`) read from `settings.frontend_origin`, rather than using an insecure wildcard `*`.
-
-### 5. UI Design Tokens
-- Design tokens are specified as CSS custom properties in `frontend/src/index.css`.
-- The interface adapts the warm stone and cream palette (`#F3F0EE`), stadium pill contours, and clear typography from the GetDesign Mastercard reference while respecting brand neutrality (no proprietary logos or brand marks).
-
----
-
-## Stopping the Database
-
-To stop the PostgreSQL container without deleting stored task data:
+Untuk menghentikan container PostgreSQL tanpa menghapus data task:
 
 ```bash
 docker compose --env-file backend/.env down
 ```
 
-To stop the container and completely reset the database volume:
+Untuk menghentikan container sekaligus menghapus volume database (*clean reset*):
 
 ```bash
 docker compose --env-file backend/.env down -v
@@ -241,6 +183,8 @@ docker compose --env-file backend/.env down -v
 
 ---
 
-## License
+## Dokumentasi Detail Sub-Repositori
 
-This project was developed for the GLI Technical Assessment.
+Untuk penjelasan mendalam mengenai arsitektur internal, struktur folder, dan library spesifik pada masing-masing layer:
+- **Dokumentasi Frontend:** [frontend/README.md](frontend/README.md)
+- **Dokumentasi Backend:** [backend/README.md](backend/README.md)
