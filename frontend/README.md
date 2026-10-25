@@ -6,21 +6,21 @@ Aplikasi antarmuka web task management berbasis React 19, Vite, dan Tailwind CSS
 
 ## Daftar Library
 
-| Library | Versi | Fungsi |
-| :--- | :--- | :--- |
-| `react` / `react-dom` | `^19.3.1` | Core UI library deklaratif berbasis komponen untuk rendering antarmuka pengguna. |
-| `axios` | `^1.20.0` | HTTP client untuk komunikasi REST API ke backend dengan normalisasi error terpusat. |
-| `tailwindcss` | `^4.3.3` | Utility-first CSS framework v4 berbasis CSS-first tokens (`@theme`). |
-| `@tailwindcss/vite` | `^4.3.3` | Plugin resmi Tailwind CSS untuk integrasi langsung ke build pipeline Vite. |
-| `vite` | `^8.3.4` | Build tool dan development server berkecepatan tinggi dengan Hot Module Replacement (HMR). |
-| `vitest` | `^4.1.12` | Test runner native Vite untuk eksekusi unit dan integration testing. |
-| `@testing-library/react` | `^16.3.3` | Library pengujian komponen React berbasis perilaku interaksi pengguna (*user-centric*). |
-| `@testing-library/dom` | `^10.4.2` | Core query selector berbasis aksesibilitas DOM. |
-| `@testing-library/user-event` | `^14.6.8` | Simulasi interaksi pengguna nyata di browser (click, type, select). |
-| `@testing-library/jest-dom` | `^7.0.1` | Custom DOM matcher untuk assertions pengujian (contoh: `toBeInTheDocument`). |
-| `jsdom` | `^29.1.1` | Simulasi browser DOM environment di Node.js untuk eksekusi unit test. |
-| `eslint` | `^10.13.0` | Linter statis untuk menjaga standar dan kualitas kode JavaScript. |
-| `eslint-plugin-react-hooks` | `^7.1.1` | Penegak aturan resmi React Hooks. |
+| Library | Fungsi |
+| :--- | :--- |
+| `react` / `react-dom` | Core UI library deklaratif berbasis komponen untuk rendering antarmuka pengguna. |
+| `axios` | HTTP client untuk komunikasi REST API ke backend dengan normalisasi error terpusat. |
+| `tailwindcss` | Utility-first CSS framework v4 berbasis CSS-first tokens (`@theme`). |
+| `@tailwindcss/vite` | Plugin resmi Tailwind CSS untuk integrasi langsung ke build pipeline Vite. |
+| `vite` | Build tool dan development server berkecepatan tinggi dengan Hot Module Replacement (HMR). |
+| `vitest` | Test runner native Vite untuk eksekusi unit dan integration testing. |
+| `@testing-library/react` | Library pengujian komponen React berbasis perilaku interaksi pengguna (*user-centric*). |
+| `@testing-library/dom` | Core query selector berbasis aksesibilitas DOM. |
+| `@testing-library/user-event` | Simulasi interaksi pengguna nyata di browser (click, type, select). |
+| `@testing-library/jest-dom` | Custom DOM matcher untuk assertions pengujian (contoh: `toBeInTheDocument`). |
+| `jsdom` | Simulasi browser DOM environment di Node.js untuk eksekusi unit test. |
+| `eslint` | Linter statis untuk menjaga standar dan kualitas kode JavaScript. |
+| `eslint-plugin-react-hooks` | Penegak aturan resmi React Hooks. |
 
 ---
 

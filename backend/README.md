@@ -6,17 +6,17 @@ Layanan RESTful API task management berbasis Python 3.9+, FastAPI, SQLModel, dan
 
 ## Daftar Library
 
-| Library | Versi | Fungsi |
-| :--- | :--- | :--- |
-| `fastapi` | `>=0.115,<1.0` | Framework web asynchronous REST API dengan validasi deklaratif dan auto-generated OpenAPI/Swagger docs di `/docs`. |
-| `uvicorn[standard]` | `>=0.30,<1.0` | Server web ASGI berkinerja tinggi berbasis `uvloop` dan `httptools` untuk menjalankan aplikasi FastAPI. |
-| `sqlmodel` | `>=0.0.22,<1.0` | ORM yang menggabungkan SQLAlchemy Core/ORM dan Pydantic untuk pemetaan model ke tabel database. |
-| `psycopg[binary]` | `>=3.2,<4.0` | Driver PostgreSQL generasi terbaru (Psycopg 3) dengan binary C extensions dan connection pooling. |
-| `pydantic-settings` | `>=2.6,<3.0` | Pengelolaan dan validasi variabel lingkungan (`.env`) berbasis kelas secara *type-safe*. |
-| `python-dotenv` | `>=1.0,<2.0` | Utilitas pembaca berkas `.env` ke dalam environment sistem Python. |
-| `pytest` | `>=8,<10` | Test runner standar untuk mengeksekusi unit dan integration test suite. |
-| `httpx` | `>=0.27,<1.0` | HTTP client async yang digunakan oleh TestClient FastAPI untuk pengujian rute API. |
-| `ruff` | `>=0.11,<1.0` | Linter dan code formatter Python berbasis Rust yang cepat dan terpadu. |
+| Library | Fungsi |
+| :--- | :--- |
+| `fastapi` | Framework web asynchronous REST API dengan validasi deklaratif dan auto-generated OpenAPI/Swagger docs di `/docs`. |
+| `uvicorn[standard]` | Server web ASGI berkinerja tinggi berbasis `uvloop` dan `httptools` untuk menjalankan aplikasi FastAPI. |
+| `sqlmodel` | ORM yang menggabungkan SQLAlchemy Core/ORM dan Pydantic untuk pemetaan model ke tabel database. |
+| `psycopg[binary]` | Driver PostgreSQL generasi terbaru (Psycopg 3) dengan binary C extensions dan connection pooling. |
+| `pydantic-settings` | Pengelolaan dan validasi variabel lingkungan (`.env`) berbasis kelas secara *type-safe*. |
+| `python-dotenv` | Utilitas pembaca berkas `.env` ke dalam environment sistem Python. |
+| `pytest` | Test runner standar untuk mengeksekusi unit dan integration test suite. |
+| `httpx` | HTTP client async yang digunakan oleh TestClient FastAPI untuk pengujian rute API. |
+| `ruff` | Linter dan code formatter Python berbasis Rust yang cepat dan terpadu. |
 
 ---
 
