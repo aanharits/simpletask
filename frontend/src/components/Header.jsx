@@ -12,7 +12,7 @@ export default function Header({
       {/* Breadcrumb Title & Task Count Badge */}
       <div className="flex items-center justify-between sm:justify-start gap-2.5">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="hidden sm:inline text-xs font-medium text-neutral-400">Workspace</span>
+          <span className="hidden sm:inline text-xs font-medium text-neutral-400">Techncial Test</span>
           <span className="hidden sm:inline text-xs text-neutral-300 select-none">/</span>
           <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
             Simple Task

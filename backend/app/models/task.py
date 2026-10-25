@@ -1,12 +1,15 @@
 import enum
 from typing import Optional
+
 from sqlmodel import CheckConstraint, Field, SQLModel
+
 
 # Enum status task sesuai spesifikasi contract ('Todo', 'In Progress', 'Done').
 class TaskStatus(str, enum.Enum):
     TODO = "Todo"
     IN_PROGRESS = "In Progress"
     DONE = "Done"
+
 
 # Model tabel task di PostgreSQL yang mendefinisikan schema dan batasan data.
 class Task(SQLModel, table=True):

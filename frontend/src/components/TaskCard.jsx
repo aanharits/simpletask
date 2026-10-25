@@ -26,6 +26,7 @@ export default function TaskCard({
   onDelete,
   isUpdating = false,
   isDeleting = false,
+  isDraggable = true,
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -81,6 +82,10 @@ export default function TaskCard({
   }
 
   const handleDragStart = (e) => {
+    if (!isDraggable) {
+      e.preventDefault()
+      return
+    }
     e.dataTransfer.setData('text/plain', String(task.id))
     e.dataTransfer.effectAllowed = 'move'
   }
@@ -111,10 +116,12 @@ export default function TaskCard({
 
   return (
     <li
-      className="bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-grab active:cursor-grabbing flex flex-col justify-between animate-fade-in"
+      className={`bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col justify-between animate-fade-in ${
+        isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+      }`}
       data-task-id={task.id}
-      draggable={!showConfirmDelete}
-      onDragStart={handleDragStart}
+      draggable={isDraggable && !showConfirmDelete}
+      onDragStart={isDraggable ? handleDragStart : undefined}
     >
       {itemError && (
         <div className="flex items-center justify-between p-2 mb-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl animate-slide-down" role="alert">

@@ -101,7 +101,6 @@ export default function TaskBoard({
     )
   }
 
-
   return (
     <div className="space-y-5">
       {/* View Switcher Tabs & Filter Buttons */}
@@ -181,7 +180,6 @@ export default function TaskBoard({
                   deletingTaskId={deletingTaskId}
                   isOver={isOver}
                   initialLimit={3}
-                  onOpenCreate={onOpenCreate}
                   onDragOver={(e) => {
                     e.preventDefault()
                     e.dataTransfer.dropEffect = 'move'
@@ -211,6 +209,7 @@ export default function TaskBoard({
         <div key={`grid-view-${activeFilter}`} className="animate-fade-in">
           <TaskGrid
             status={activeFilter}
+            col={KANBAN_COLUMNS.find((c) => c.id === activeFilter)}
             tasks={filteredTasks}
             onUpdate={onUpdate}
             onDelete={onDelete}
