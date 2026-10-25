@@ -158,7 +158,7 @@ export function useTasks() {
     })
   }, [tasks, searchQuery])
 
-  // Logika visibilitas form: form wajib terbuka jika belum ada task sama sekali
+  // visibilitas form: form wajib terbuka jika belum ada task sama sekali
   const hasTasks = tasks.length > 0
   const isFormOpen = !hasTasks || showCreateForm
   const canHideForm = hasTasks
