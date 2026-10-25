@@ -140,7 +140,7 @@ Jalankan dari direktori `frontend/`:
 ```bash
 cd frontend
 
-# Menjalankan seluruh test suite Vitest (38 tests)
+# Menjalankan seluruh test suite Vitest (43 tests)
 npm test
 
 # Memeriksa linter ESLint
@@ -150,7 +150,7 @@ npm run lint
 npm run build
 ```
 
-_Status:_ **38 tests passed** (mencakup Axios client, hook `useTasks`, hook `useToast`, rendering komponen, interaksi form, dan skenario CRUD lengkap di `App.test.jsx`).
+_Status:_ **43 tests passed** (mencakup Axios client, hook `useTasks`, hook `useTaskCard`, hook `useToast`, rendering komponen, interaksi form, dan skenario CRUD lengkap di `App.test.jsx`).
 
 ---
 

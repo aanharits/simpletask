@@ -38,22 +38,29 @@ src/
 │   ├── TaskForm.jsx        # Form input terkontrol reusable (digunakan saat Create dan Edit)
 │   ├── TaskBoard.jsx       # Kanban board orchestrator, filter tabs, dan drag-and-drop
 │   ├── KanbanColumn.jsx    # Kolom status Kanban (limit 3 data + expand/collapse, drop target)
-│   ├── TaskCard.jsx        # Kartu task individual (status badge, quick select, edit, delete confirm)
+│   ├── TaskCard.jsx        # Orchestrator kartu task (menghubungkan useTaskCard ke sub-komponen)
+│   ├── task-card/          # Sub-komponen modular kartu task
+│   │   ├── TaskCardBody.jsx     # Judul, deskripsi, meta ID, dan progress status badge
+│   │   ├── TaskCardFooter.jsx   # Quick status dropdown, tombol aksi, dan dialog konfirmasi hapus
+│   │   ├── TaskCardEditView.jsx # Tampilan pembungkus form saat mode edit inline aktif
+│   │   └── TaskCardError.jsx    # Banner alert error lokal per kartu jika operasi gagal
 │   ├── TaskGrid.jsx        # Layout multi-kolom responsif saat filter tab status aktif
 │   ├── Toast.jsx           # Floating toaster container dan alert notifikasi
 │   └── Footer.jsx          # Footer aplikasi
 │
 ├── hooks/          # Custom React Hooks (Business Logic & State Controller)
-│   ├── useTasks.js # Controller utama: state data, CRUD request, search filter, form visibility
-│   └── useToast.js # Manajer antrean floating notification dengan auto-dismiss timer
+│   ├── useTasks.js    # Controller utama: state data, CRUD request, search filter, form visibility
+│   ├── useTaskCard.js # Controller kartu task: state edit, konfirmasi hapus, status sync, DnD
+│   └── useToast.js    # Manajer antrean floating notification dengan auto-dismiss timer
 │
 ├── test/           # Test suite otomatis (Vitest + Testing Library)
-│   ├── setup.js        # Konfigurasi global DOM matchers
-│   ├── client.test.js  # Pengujian Axios client dan normalisasi error
-│   ├── useTasks.test.js# Pengujian controller logic hook useTasks
-│   ├── useToast.test.js# Pengujian antrean notifikasi useToast
-│   ├── Toast.test.jsx  # Pengujian rendering komponen Toast
-│   └── App.test.jsx    # Pengujian integrasi alur kerja CRUD pada komponen App
+│   ├── setup.js          # Konfigurasi global DOM matchers
+│   ├── client.test.js    # Pengujian Axios client dan normalisasi error
+│   ├── useTasks.test.js  # Pengujian controller logic hook useTasks
+│   ├── useToast.test.js  # Pengujian antrean notifikasi useToast
+│   ├── TaskCard.test.jsx # Pengujian unit interaksi kartu task (render, status, edit, delete, error)
+│   ├── Toast.test.jsx    # Pengujian rendering komponen Toast
+│   └── App.test.jsx      # Pengujian integrasi alur kerja CRUD pada komponen App
 │
 ├── App.jsx         # Pure presenter component (merangkai komponen UI tanpa inline logic)
 ├── index.css       # Tailwind v4 theme tokens, keyframe animasi, dan utility classes
@@ -68,7 +75,7 @@ src/
 # Menjalankan development server lokal (http://localhost:5173)
 npm run dev
 
-# Menjalankan seluruh test suite otomatis (38 tests)
+# Menjalankan seluruh test suite otomatis (43 tests)
 npm test
 
 # Menjalankan test dalam mode watch interaktif
