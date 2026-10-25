@@ -1,5 +1,7 @@
 # SimpleTask
 
+![Preview App](frontend/src/assets/image.png)
+
 Aplikasi task management full-stack berbasis FastAPI (Python 3.9+) dan React 19 (Vite) dengan database persisten PostgreSQL 17.
 
 ## Tech Stack
