@@ -13,7 +13,7 @@ Aplikasi task management full-stack berbasis FastAPI (Python 3.9+) dan React 19 
 | **Backend**      | Python 3.9+, FastAPI            | Framework web async berkecepatan tinggi dengan dokumentasi OpenAPI/Swagger otomatis di `/docs`          |
 | **ORM & Driver** | SQLModel, Psycopg 3             | Abstraksi model database berbasis SQLAlchemy Core/ORM dan Pydantic v2 dengan connection pooling         |
 | **Database**     | PostgreSQL 17 Alpine            | Database relasional persisten via Docker Compose (OrbStack / Docker Engine)                             |
-| **Testing**      | Vitest, Testing Library, pytest | Test suite otomatis: 38 frontend tests dan 42 backend tests                                             |
+| **Testing**      | Vitest, Testing Library, pytest | Test suite otomatis: 43 frontend tests dan 42 backend tests                                             |
 | **Linter**       | ESLint, Ruff                    | Pemeliharaan standar kode statis JavaScript dan Python                                                  |
 
 ---
@@ -28,7 +28,7 @@ Pastikan perangkat Anda telah terpasang:
 
 ---
 
-## Panduan Memulai Cepat (Quickstart)
+## Quickstart
 
 ### 1. Salin Berkas Konfigurasi Lingkungan
 
