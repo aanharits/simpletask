@@ -25,7 +25,7 @@ export default function TaskCardBody({ task }) {
     <div>
       {/* Task Title */}
       <h3
-        className={`text-sm font-bold leading-snug break-words mb-1 ${
+        className={`text-sm font-bold leading-snug wrap-break-word mb-1 ${
           isDone ? 'text-neutral-500 line-through' : 'text-neutral-900'
         }`}
       >
@@ -34,7 +34,7 @@ export default function TaskCardBody({ task }) {
 
       {/* Task Description */}
       {task.description ? (
-        <p className="text-xs text-neutral-500 leading-relaxed whitespace-pre-wrap break-words line-clamp-2 mb-3">
+        <p className="text-xs text-neutral-500 leading-relaxed whitespace-pre-wrap wrap-break-word line-clamp-2 mb-3">
           {task.description}
         </p>
       ) : (

@@ -7,3 +7,6 @@ import { afterEach } from 'vitest'
 afterEach(() => {
   cleanup()
 })
+
+// jsdom tidak menyediakan API scrolling layout browser.
+Element.prototype.scrollIntoView = () => {}

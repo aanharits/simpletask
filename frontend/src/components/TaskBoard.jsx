@@ -51,10 +51,12 @@ const KANBAN_COLUMNS = [
 // Komponen board layout utama: Board view dengan batasan 3 data & expand, serta status view dengan responsif grid.
 export default function TaskBoard({
   tasks,
+  totalTaskCount = tasks.length,
+  onClearSearch,
   onUpdate,
   onDelete,
-  updatingTaskId = null,
-  deletingTaskId = null,
+  updatingTaskIds = new Set(),
+  deletingTaskIds = new Set(),
   activeFilter = 'All',
   onFilterChange,
   onOpenCreate = null,
@@ -68,7 +70,7 @@ export default function TaskBoard({
   })
 
   // Tampilkan empty state global jika belum ada data task
-  if (tasks.length === 0) {
+  if (totalTaskCount === 0) {
     return (
       <div
         className="flex flex-col items-center justify-center text-center p-12 bg-[#F7F6F4] border border-dashed border-neutral-300 rounded-3xl"
@@ -106,7 +108,7 @@ export default function TaskBoard({
       {/* View Switcher Tabs & Filter Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div
-          className="w-full sm:w-auto flex items-center p-1 bg-[#EBE9E6] rounded-xl border border-neutral-200/60 shadow-2xs overflow-x-auto no-scrollbar"
+          className="w-full sm:w-auto flex items-center p-1 bg-column-bg rounded-xl border border-neutral-200/60 shadow-2xs overflow-x-auto no-scrollbar"
           role="group"
           aria-label="Filter tasks by status"
         >
@@ -143,8 +145,17 @@ export default function TaskBoard({
       </div>
 
       {/* Tampilan jika filter spesifik tidak memiliki task yang cocok */}
-      {filteredTasks.length === 0 ? (
-        <div className="text-center py-14 px-4 bg-[#FAF9F7] border border-neutral-200/70 rounded-3xl animate-fade-in">
+      {tasks.length === 0 ? (
+        <div className="py-12 text-center" role="status">
+          <h3 className="text-base font-bold text-neutral-900">No matching tasks</h3>
+          <p className="text-xs text-neutral-500 mt-1">Try another search or clear your search.</p>
+          <button type="button" onClick={onClearSearch}
+            className="mt-4 px-4 py-2 text-xs font-semibold border border-neutral-300 rounded-xl cursor-pointer">
+            Clear search
+          </button>
+        </div>
+      ) : filteredTasks.length === 0 ? (
+        <div className="text-center py-14 px-4 bg-sidebar-bg border border-neutral-200/70 rounded-3xl animate-fade-in">
           <p className="text-sm text-neutral-600 mb-3">
             No tasks match the filter &ldquo;{activeFilter}&rdquo;.
           </p>
@@ -169,15 +180,15 @@ export default function TaskBoard({
             return (
               <div
                 key={col.id}
-                className="w-[85vw] max-w-[340px] sm:w-auto sm:max-w-none shrink-0 sm:shrink snap-center"
+                className="w-[85vw] max-w-85 sm:w-auto sm:max-w-none shrink-0 sm:shrink snap-center"
               >
                 <KanbanColumn
                   col={col}
                   tasks={columnTasks}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
-                  updatingTaskId={updatingTaskId}
-                  deletingTaskId={deletingTaskId}
+                  updatingTaskIds={updatingTaskIds}
+                  deletingTaskIds={deletingTaskIds}
                   isOver={isOver}
                   initialLimit={3}
                   onDragOver={(e) => {
@@ -190,13 +201,17 @@ export default function TaskBoard({
                       setDragOverCol(null)
                     }
                   }}
-                  onDrop={(e) => {
+                  onDrop={async (e) => {
                     e.preventDefault()
                     setDragOverCol(null)
                     const idStr = e.dataTransfer.getData('text/plain')
                     const taskId = Number(idStr)
-                    if (taskId && !isNaN(taskId)) {
-                      onUpdate(taskId, { status: col.id }, { silent: true })
+                    if (taskId && !isNaN(taskId) && !updatingTaskIds.has(taskId) && !deletingTaskIds.has(taskId)) {
+                      try {
+                        await onUpdate(taskId, { status: col.id }, { silent: true })
+                      } catch {
+                        // Feedback error sudah ditampilkan controller melalui toast.
+                      }
                     }
                   }}
                 />
@@ -213,8 +228,8 @@ export default function TaskBoard({
             tasks={filteredTasks}
             onUpdate={onUpdate}
             onDelete={onDelete}
-            updatingTaskId={updatingTaskId}
-            deletingTaskId={deletingTaskId}
+            updatingTaskIds={updatingTaskIds}
+            deletingTaskIds={deletingTaskIds}
           />
         </div>
       )}

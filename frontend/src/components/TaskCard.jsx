@@ -12,6 +12,7 @@ export default function TaskCard({
   isDeleting = false,
   isDraggable = true,
 }) {
+  const canDrag = isDraggable && !isUpdating && !isDeleting
   const {
     isEditing,
     showConfirmDelete,
@@ -26,7 +27,7 @@ export default function TaskCard({
     promptDelete,
     cancelDelete,
     clearError,
-  } = useTaskCard({ task, onUpdate, onDelete, isUpdating, isDraggable })
+  } = useTaskCard({ task, onUpdate, onDelete, isUpdating, isDraggable: canDrag })
 
   if (isEditing) {
     return (
@@ -42,11 +43,11 @@ export default function TaskCard({
   return (
     <li
       className={`bg-white rounded-2xl p-4 shadow-2xs border border-neutral-200/80 hover:shadow-md hover:border-neutral-300 hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col justify-between animate-fade-in ${
-        isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+        canDrag ? 'cursor-grab active:cursor-grabbing' : ''
       }`}
       data-task-id={task.id}
-      draggable={isDraggable && !showConfirmDelete}
-      onDragStart={isDraggable ? handleDragStart : undefined}
+      draggable={canDrag && !showConfirmDelete}
+      onDragStart={canDrag ? handleDragStart : undefined}
     >
       <TaskCardError error={itemError} onDismiss={clearError} />
 

@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 // Komponen form input terkontrol untuk membuat task baru atau mengedit task yang ada.
 export default function TaskForm({
   onSubmit,
+  focusRequest = 0,
   initialData = null,
   isSubmitting = false,
   buttonText = 'Add Task',
   onCancel = null,
   idPrefix = 'task-form',
 }) {
+  const titleRef = useRef(null)
+  useEffect(() => {
+    if (focusRequest > 0) {
+      titleRef.current?.focus()
+      titleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [focusRequest])
+
   const [title, setTitle] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
   const [status, setStatus] = useState(initialData?.status || 'Todo')
@@ -73,6 +82,7 @@ export default function TaskForm({
           <span className="text-[10px] sm:text-[11px] font-mono text-neutral-400">{title.length}/120</span>
         </div>
         <input
+          ref={titleRef}
           id={`${idPrefix}-title`}
           type="text"
           className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out disabled:bg-neutral-50 disabled:text-neutral-400"
@@ -97,7 +107,7 @@ export default function TaskForm({
         </div>
         <textarea
           id={`${idPrefix}-description`}
-          className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out resize-y min-h-[58px] sm:min-h-[72px] disabled:bg-neutral-50 disabled:text-neutral-400"
+          className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out resize-y min-h-14.5 sm:min-h-18 disabled:bg-neutral-50 disabled:text-neutral-400"
           placeholder="Add any extra context or requirements..."
           value={description}
           maxLength={2000}

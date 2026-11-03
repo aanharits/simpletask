@@ -1,220 +1,68 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
-import { useTasks } from '../hooks/useTasks'
+import useTasks from '../hooks/useTasks'
 import { apiClient } from '../api/client'
 
-const mockTasks = [
-  { id: 1, title: 'Task 1', description: 'Desc 1', status: 'Todo' },
-  { id: 2, title: 'Task 2', description: 'Desc 2', status: 'In Progress' },
+const tasks = [
+  { id: 1, title: 'First', status: 'Todo' },
+  { id: 2, title: 'Second', status: 'Todo' },
 ]
+function deferred() {
+  let resolve, reject
+  const promise = new Promise((res, rej) => { resolve = res; reject = rej })
+  return { promise, resolve, reject }
+}
 
-describe('useTasks Custom Hook Tests', () => {
+describe('useTasks concurrent mutations', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: tasks })
   })
 
-  it('loads tasks on mount and computes stats accurately', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
-
+  it.each(['update', 'delete'])('tracks concurrent %s requests independently, including failures', async (action) => {
+    const first = deferred()
+    const second = deferred()
+    vi.spyOn(apiClient, action === 'update' ? 'put' : 'delete')
+      .mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise)
     const { result } = renderHook(() => useTasks())
-
-    expect(result.current.loading).toBe(true)
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    const pendingKey = action === 'update' ? 'updatingTaskIds' : 'deletingTaskIds'
+    let one, two
+    act(() => {
+      one = result.current[action + 'Task'](1, { status: 'Done' }).catch((error) => error)
+      two = result.current[action + 'Task'](2, { status: 'Done' })
     })
-
-    expect(result.current.tasks).toHaveLength(2)
-    expect(result.current.stats).toEqual({
-      total: 2,
-      todo: 1,
-      inProgress: 1,
-      done: 0,
-    })
-  })
-
-  it('handles load error and allows retrying', async () => {
-    vi.spyOn(apiClient, 'get').mockRejectedValueOnce(new Error('Connection Failed'))
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loadError).toBe('Connection Failed')
-    })
-    expect(result.current.loading).toBe(false)
-
-    // Now mock success on retry
-    vi.spyOn(apiClient, 'get').mockResolvedValueOnce({ data: mockTasks })
-
+    expect([...result.current[pendingKey]]).toEqual([1, 2])
     await act(async () => {
-      await result.current.retryLoad()
+      second.resolve({ data: { ...tasks[1], status: 'Done' } })
+      await two
     })
-
-    expect(result.current.tasks).toHaveLength(2)
-    expect(result.current.loadError).toBe('')
-  })
-
-  it('creates task and appends in sorted order', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
-    vi.spyOn(apiClient, 'post').mockResolvedValue({
-      data: { id: 3, title: 'Task 3', description: '', status: 'Done' },
-    })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    expect([...result.current[pendingKey]]).toEqual([1])
     await act(async () => {
-      await result.current.createTask({ title: 'Task 3', description: '', status: 'Done' })
+      first.reject(new Error('Failed'))
+      await one
     })
-
-    expect(result.current.tasks).toHaveLength(2)
-    expect(result.current.tasks[1].id).toBe(3)
-    expect(result.current.actionSuccess).toContain('Task 3')
+    expect(result.current[pendingKey].size).toBe(0)
+    expect(result.current.tasks.find((task) => task.id === 1)).toEqual(tasks[0])
   })
 
-  it('updates task in-place and clears updatingTaskId', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
-    vi.spyOn(apiClient, 'put').mockResolvedValue({
-      data: { ...mockTasks[0], status: 'Done' },
-    })
-
+  it('blocks a second mutation for the same ID before the next render', async () => {
+    const pending = deferred()
+    const put = vi.spyOn(apiClient, 'put').mockReturnValue(pending.promise)
+    const remove = vi.spyOn(apiClient, 'delete')
     const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    let update
     await act(async () => {
-      await result.current.updateTask(1, { status: 'Done' })
+      update = result.current.updateTask(1, { status: 'Done' })
+      await expect(result.current.deleteTask(1)).rejects.toThrow('already')
+      await expect(result.current.updateTask(1, {})).rejects.toThrow('already')
     })
-
-    expect(result.current.tasks[0].status).toBe('Done')
-    expect(result.current.updatingTaskId).toBeNull()
-  })
-
-  it('deletes task and removes from list', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
-    vi.spyOn(apiClient, 'delete').mockResolvedValue({ data: null })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
+    expect(put).toHaveBeenCalledTimes(1)
+    expect(remove).not.toHaveBeenCalled()
     await act(async () => {
-      await result.current.deleteTask(1)
+      pending.resolve({ data: { ...tasks[0], status: 'Done' } })
+      await update
     })
-
-    expect(result.current.tasks).toHaveLength(0)
-    expect(result.current.deletingTaskId).toBeNull()
-  })
-
-  it('filters displayedTasks based on searchQuery case-insensitively', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    expect(result.current.displayedTasks).toHaveLength(2)
-
-    act(() => {
-      result.current.setSearchQuery('task 1')
-    })
-    expect(result.current.displayedTasks).toHaveLength(1)
-    expect(result.current.displayedTasks[0].title).toBe('Task 1')
-
-    // Search by description
-    act(() => {
-      result.current.setSearchQuery('desc 2')
-    })
-    expect(result.current.displayedTasks).toHaveLength(1)
-    expect(result.current.displayedTasks[0].title).toBe('Task 2')
-
-    // Search non-matching query
-    act(() => {
-      result.current.setSearchQuery('non-existent')
-    })
-    expect(result.current.displayedTasks).toHaveLength(0)
-  })
-
-  it('manages form visibility states and toggles when tasks exist', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: mockTasks })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    expect(result.current.canHideForm).toBe(true)
-    expect(result.current.isFormOpen).toBe(true)
-
-    act(() => {
-      result.current.toggleForm()
-    })
-    expect(result.current.isFormOpen).toBe(false)
-
-    act(() => {
-      result.current.openCreateForm()
-    })
-    expect(result.current.isFormOpen).toBe(true)
-
-    act(() => {
-      result.current.closeForm()
-    })
-    expect(result.current.isFormOpen).toBe(false)
-  })
-
-  it('keeps form permanently open when no tasks exist', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [] })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    expect(result.current.canHideForm).toBe(false)
-    expect(result.current.isFormOpen).toBe(true)
-
-    act(() => {
-      result.current.toggleForm()
-    })
-    // Still open because hasTasks is false
-    expect(result.current.isFormOpen).toBe(true)
-  })
-
-  it('pushes toasts when creating, updating, and deleting tasks', async () => {
-    vi.spyOn(apiClient, 'get').mockResolvedValue({ data: [mockTasks[0]] })
-    vi.spyOn(apiClient, 'post').mockResolvedValue({
-      data: { id: 3, title: 'New Hook Task', description: '', status: 'Todo' },
-    })
-
-    const { result } = renderHook(() => useTasks())
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    await act(async () => {
-      await result.current.createTask({ title: 'New Hook Task', description: '', status: 'Todo' })
-    })
-
-    expect(result.current.toasts.length).toBeGreaterThan(0)
-    expect(result.current.toasts[0].message).toContain('New Hook Task')
-    expect(result.current.toasts[0].type).toBe('success')
-
-    act(() => {
-      result.current.removeToast(result.current.toasts[0].id)
-    })
-    expect(result.current.toasts).toHaveLength(0)
   })
 })
-

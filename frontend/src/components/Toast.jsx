@@ -23,7 +23,7 @@ export function ToastItem({ toast, onDismiss }) {
             {isSuccess ? 'Success' : 'Notice'}
           </h4>
         </div>
-        <p className="text-xs font-medium text-neutral-100 leading-relaxed break-words">
+        <p className="text-xs font-medium text-neutral-100 leading-relaxed wrap-break-word">
           {toast.message}
         </p>
       </div>

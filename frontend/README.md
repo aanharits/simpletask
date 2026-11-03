@@ -49,14 +49,17 @@ src/
 │   └── Footer.jsx          # Footer aplikasi
 │
 ├── hooks/          # Custom React Hooks (Business Logic & State Controller)
-│   ├── useTasks.js    # Controller utama: state data, CRUD request, search filter, form visibility
+│   ├── useTasks.js    # State data, CRUD request, loading, dan tracking request per task
+│   ├── useTaskPage.js # Controller halaman: search, filter, visibilitas form, permintaan fokus, toast
 │   ├── useTaskCard.js # Controller kartu task: state edit, konfirmasi hapus, status sync, DnD
 │   └── useToast.js    # Manajer antrean floating notification dengan auto-dismiss timer
 │
 ├── test/           # Test suite otomatis (Vitest + Testing Library)
 │   ├── setup.js          # Konfigurasi global DOM matchers
 │   ├── client.test.js    # Pengujian Axios client dan normalisasi error
-│   ├── useTasks.test.js  # Pengujian controller logic hook useTasks
+│   ├── useTasks.test.js  # Pengujian request bersamaan dan pencegahan mutasi ganda per task
+│   ├── useTaskPage.test.js # Pengujian CRUD, pencarian, visibilitas form, dan feedback toast
+│   ├── TaskBoard.test.jsx # Pengujian drag saat task diproses dan penanganan kegagalan drop
 │   ├── useToast.test.js  # Pengujian antrean notifikasi useToast
 │   ├── TaskCard.test.jsx # Pengujian unit interaksi kartu task (render, status, edit, delete, error)
 │   ├── Toast.test.jsx    # Pengujian rendering komponen Toast
@@ -75,7 +78,7 @@ src/
 # Menjalankan development server lokal (http://localhost:5173)
 npm run dev
 
-# Menjalankan seluruh test suite otomatis (43 tests)
+# Menjalankan seluruh test suite otomatis (52 tests)
 npm test
 
 # Menjalankan test dalam mode watch interaktif

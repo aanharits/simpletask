@@ -1,11 +1,11 @@
-import useTasks from './hooks/useTasks'
+import useTaskPage from './hooks/useTaskPage'
 import Header from './components/Header'
 import TaskCreatePanel from './components/TaskCreatePanel'
 import TaskBoard from './components/TaskBoard'
 import ToastContainer from './components/Toast'
 import Footer from './components/Footer'
 
-// Komponen root Simple Task: Pure presentation layer yang mengonsumsi state & controller dari useTasks.
+// Komponen root Simple Task: Pure presentation layer yang mengonsumsi state & controller dari useTaskPage.
 export default function App() {
   const {
     tasks,
@@ -17,8 +17,8 @@ export default function App() {
     updateTask,
     deleteTask,
     isCreating,
-    updatingTaskId,
-    deletingTaskId,
+    updatingTaskIds,
+    deletingTaskIds,
     activeFilter,
     setActiveFilter,
     searchQuery,
@@ -28,9 +28,11 @@ export default function App() {
     toggleForm,
     closeForm,
     openCreateForm,
+    focusRequest,
+    clearSearch,
     toasts,
     removeToast,
-  } = useTasks()
+  } = useTaskPage()
 
   return (
     <div className="min-h-screen bg-[#ECEAE7] p-0 sm:p-6 lg:p-8 flex justify-center font-sans antialiased text-neutral-800">
@@ -38,7 +40,7 @@ export default function App() {
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       {/* Main Clean Card Frame */}
-      <div className="w-full max-w-6xl bg-white rounded-none sm:rounded-3xl shadow-none sm:shadow-[0_12px_40px_rgba(0,0,0,0.06)] border-0 sm:border border-neutral-200/70 overflow-hidden flex flex-col p-4 sm:p-8 min-h-screen sm:min-h-[800px]">
+      <div className="w-full max-w-6xl bg-white rounded-none sm:rounded-3xl shadow-none sm:shadow-[0_12px_40px_rgba(0,0,0,0.06)] border-0 sm:border border-neutral-200/70 overflow-hidden flex flex-col p-4 sm:p-8 min-h-screen sm:min-h-200">
         {/* Modular Navbar Header */}
         <Header
           taskCount={tasks.length}
@@ -51,6 +53,7 @@ export default function App() {
 
         {/* Modular Collapsible Create Task Section */}
         <TaskCreatePanel
+          focusRequest={focusRequest}
           isOpen={isFormOpen}
           canClose={canHideForm}
           onClose={closeForm}
@@ -83,10 +86,12 @@ export default function App() {
           ) : (
             <TaskBoard
               tasks={displayedTasks}
+              totalTaskCount={tasks.length}
+              onClearSearch={clearSearch}
               onUpdate={updateTask}
               onDelete={deleteTask}
-              updatingTaskId={updatingTaskId}
-              deletingTaskId={deletingTaskId}
+              updatingTaskIds={updatingTaskIds}
+              deletingTaskIds={deletingTaskIds}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
               onOpenCreate={openCreateForm}

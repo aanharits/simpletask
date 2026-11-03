@@ -1,18 +1,18 @@
 import TaskCard from './TaskCard'
 
 // Komponen grid responsif untuk menampilkan task langsung pada tab Todo, In Progress, atau Done
-// Dilengkapi container berlatar bg-[#EBE9E6] serta header status konsisten seperti kolom pada Board ('All').
+// Dilengkapi container berlatar bg-column-bg serta header status konsisten seperti kolom pada Board ('All').
 export default function TaskGrid({
   status,
   col = null,
   tasks,
   onUpdate,
   onDelete,
-  updatingTaskId = null,
-  deletingTaskId = null,
+  updatingTaskIds = new Set(),
+  deletingTaskIds = new Set(),
 }) {
   return (
-    <div className="flex flex-col bg-[#EBE9E6] border border-neutral-200/70 rounded-2xl p-3 sm:p-4 transition-all duration-200 ease-out">
+    <div className="flex flex-col bg-column-bg border border-neutral-200/70 rounded-2xl p-3 sm:p-4 transition-all duration-200 ease-out">
       {/* Header Kolom: Icon + Title + Count */}
       <div className="flex items-center px-1 pb-3 mb-3.5 border-b border-neutral-200/60">
         <div className="flex items-center gap-2">
@@ -42,8 +42,8 @@ export default function TaskGrid({
               task={task}
               onUpdate={onUpdate}
               onDelete={onDelete}
-              isUpdating={updatingTaskId === task.id}
-              isDeleting={deletingTaskId === task.id}
+              isUpdating={updatingTaskIds.has(task.id)}
+              isDeleting={deletingTaskIds.has(task.id)}
               isDraggable={false}
             />
           ))}

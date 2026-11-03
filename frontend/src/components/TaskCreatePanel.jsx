@@ -3,6 +3,7 @@ import TaskForm from './TaskForm'
 // Komponen panel pembuatan task dengan wrapper accordion transisi roll-down & roll-up.
 export default function TaskCreatePanel({
   isOpen = true,
+  focusRequest = 0,
   canClose = false,
   onClose,
   onSubmit,
@@ -12,7 +13,7 @@ export default function TaskCreatePanel({
     <div className={`form-accordion ${isOpen ? 'is-open' : ''}`}>
       <div className="form-accordion-inner">
         <section
-          className="bg-[#FAF9F7] border border-neutral-200/90 rounded-2xl p-3.5 sm:p-5 shadow-2xs mb-4 sm:mb-6"
+          className="bg-sidebar-bg border border-neutral-200/90 rounded-2xl p-3.5 sm:p-5 shadow-2xs mb-4 sm:mb-6"
           aria-labelledby="create-task-heading"
         >
           <div className="flex items-center justify-between pb-2.5 sm:pb-3 mb-2.5 sm:mb-3 border-b border-neutral-200/60">
@@ -37,6 +38,7 @@ export default function TaskCreatePanel({
           </div>
 
           <TaskForm
+            focusRequest={focusRequest}
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
             buttonText="Create Task"

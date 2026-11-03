@@ -7,8 +7,8 @@ export default function KanbanColumn({
   tasks,
   onUpdate,
   onDelete,
-  updatingTaskId = null,
-  deletingTaskId = null,
+  updatingTaskIds = new Set(),
+  deletingTaskIds = new Set(),
   isOver = false,
   onDragOver,
   onDragLeave,
@@ -24,7 +24,7 @@ export default function KanbanColumn({
 
   return (
     <div
-      className={`flex flex-col bg-[#EBE9E6] border rounded-2xl p-3 transition-all duration-200 ease-out ${
+      className={`flex flex-col bg-column-bg border rounded-2xl p-3 transition-all duration-200 ease-out ${
         isOver
           ? 'border-neutral-900 bg-neutral-200/80 ring-2 ring-neutral-900/15 scale-[1.01]'
           : 'border-neutral-200/70 hover:border-neutral-300'
@@ -61,8 +61,8 @@ export default function KanbanColumn({
                 task={task}
                 onUpdate={onUpdate}
                 onDelete={onDelete}
-                isUpdating={updatingTaskId === task.id}
-                isDeleting={deletingTaskId === task.id}
+                isUpdating={updatingTaskIds.has(task.id)}
+                isDeleting={deletingTaskIds.has(task.id)}
                 isDraggable={true}
               />
             ))}
