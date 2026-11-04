@@ -152,7 +152,7 @@ npm run lint
 npm run build
 ```
 
-_Status:_ **43 tests passed** (mencakup Axios client, hook `useTasks`, hook `useTaskCard`, hook `useToast`, rendering komponen, interaksi form, dan skenario CRUD lengkap di `App.test.jsx`).
+_Status:_ **52 tests passed** (mencakup Axios client, hook `useTasks`, hook `useTaskCard`, hook `useToast`, rendering komponen, interaksi form, dan skenario CRUD lengkap di `App.test.jsx`).
 
 ---
 

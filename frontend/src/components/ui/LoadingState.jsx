@@ -1,4 +1,3 @@
-// Indikator loading dengan spinner dan pesan yang diumumkan ke screen reader.
 export default function LoadingState({ message = 'Loading...' }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center" role="status" aria-live="polite">
