@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
-import useTasks from '../hooks/useTasks'
-import { apiClient } from '../api/client'
+import useTasks from '@/hooks/useTasks'
+import { apiClient } from '@/api/client'
 
 const tasks = [
   { id: 1, title: 'First', status: 'Todo' },

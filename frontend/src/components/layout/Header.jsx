@@ -1,3 +1,5 @@
+import Button from '@/components/ui/Button'
+
 // Komponen navbar header: breadcrumb, task counter badge, search input, dan tombol toggle form.
 export default function Header({
   taskCount = 0,
@@ -12,7 +14,7 @@ export default function Header({
       {/* Breadcrumb Title & Task Count Badge */}
       <div className="flex items-center justify-between sm:justify-start gap-2.5">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="hidden sm:inline text-xs font-medium text-neutral-400">Techncial Test</span>
+          <span className="hidden sm:inline text-xs font-medium text-neutral-400">Technical Test</span>
           <span className="hidden sm:inline text-xs text-neutral-300 select-none">/</span>
           <h1 className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 leading-none">
             Simple Task
@@ -60,13 +62,9 @@ export default function Header({
 
         {/* Toggle Create Form Button: hanya muncul jika sudah ada data task */}
         {canHideForm && (
-          <button
-            type="button"
-            onClick={onToggleForm}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white rounded-xl shadow-xs transition-all duration-150 cursor-pointer shrink-0"
-          >
-            <span>{isFormOpen ? '− Hide Form' : '+ New Task'}</span>
-          </button>
+          <Button size="sm" className="shrink-0" onClick={onToggleForm}>
+            {isFormOpen ? '− Hide Form' : '+ New Task'}
+          </Button>
         )}
       </div>
     </header>

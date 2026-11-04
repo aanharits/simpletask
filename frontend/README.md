@@ -28,47 +28,64 @@ Aplikasi antarmuka web task management berbasis React 19, Vite, dan Tailwind CSS
 
 ```text
 src/
-├── api/            # Konfigurasi Axios instance dan endpoint HTTP request
-│   ├── client.js   # Instance Axios terpusat (baseURL, timeout, headers)
-│   └── tasks.js    # Fungsi API CRUD tasks dan normalisasi format error
+├── api/                # Konfigurasi Axios instance dan endpoint HTTP request
+│   ├── client.js       # Instance Axios terpusat (baseURL, timeout, headers) + normalisasi error
+│   └── tasks.js        # Fungsi API CRUD tasks
 │
-├── components/     # Komponen UI modular
-│   ├── Header.jsx          # Top navigation: breadcrumb, task counter badge, search, toggle form
-│   ├── TaskCreatePanel.jsx # Panel accordion collapsible untuk membuat task baru
-│   ├── TaskForm.jsx        # Form input terkontrol reusable (digunakan saat Create dan Edit)
-│   ├── TaskBoard.jsx       # Kanban board orchestrator, filter tabs, dan drag-and-drop
-│   ├── KanbanColumn.jsx    # Kolom status Kanban (limit 3 data + expand/collapse, drop target)
-│   ├── TaskCard.jsx        # Orchestrator kartu task (menghubungkan useTaskCard ke sub-komponen)
-│   ├── task-card/          # Sub-komponen modular kartu task
-│   │   ├── TaskCardBody.jsx     # Judul, deskripsi, meta ID, dan progress status badge
-│   │   ├── TaskCardFooter.jsx   # Quick status dropdown, tombol aksi, dan dialog konfirmasi hapus
-│   │   ├── TaskCardEditView.jsx # Tampilan pembungkus form saat mode edit inline aktif
-│   │   └── TaskCardError.jsx    # Banner alert error lokal per kartu jika operasi gagal
-│   ├── TaskGrid.jsx        # Layout multi-kolom responsif saat filter tab status aktif
-│   ├── Toast.jsx           # Floating toaster container dan alert notifikasi
-│   └── Footer.jsx          # Footer aplikasi
+├── constants/
+│   └── task.js         # Single source of truth: status task, filter, batas validasi, metadata kolom
 │
-├── hooks/          # Custom React Hooks (Business Logic & State Controller)
-│   ├── useTasks.js    # State data, CRUD request, loading, dan tracking request per task
-│   ├── useTaskPage.js # Controller halaman: search, filter, visibilitas form, permintaan fokus, toast
-│   ├── useTaskCard.js # Controller kartu task: state edit, konfirmasi hapus, status sync, DnD
-│   └── useToast.js    # Manajer antrean floating notification dengan auto-dismiss timer
+├── components/
+│   ├── layout/         # Kerangka halaman
+│   │   ├── Header.jsx  # Breadcrumb, task counter badge, search, tombol toggle form
+│   │   └── Footer.jsx
+│   │
+│   ├── ui/             # Komponen generik tanpa pengetahuan domain task (reusable)
+│   │   ├── Button.jsx       # Tombol dasar dengan variant primary & secondary
+│   │   ├── EmptyState.jsx   # Blok kosong/error: ikon, judul, deskripsi, aksi
+│   │   ├── LoadingState.jsx # Spinner + pesan loading yang aksesibel
+│   │   └── Toast.jsx        # Floating toaster container dan item notifikasi
+│   │
+│   └── task/           # Komponen fitur task
+│       ├── TaskBoard.jsx          # Orchestrator board: empty state, Kanban, atau grid sesuai filter
+│       ├── StatusFilterTabs.jsx   # Tab filter Board / Todo / In Progress / Done + jumlah task
+│       ├── KanbanColumn.jsx       # Kolom Kanban (drop target, limit 3 kartu + expand/collapse)
+│       ├── TaskGrid.jsx           # Grid responsif saat tab status tunggal aktif
+│       ├── StatusColumnHeader.jsx # Header kolom: ikon status, judul, jumlah (KanbanColumn & TaskGrid)
+│       ├── TaskForm.jsx           # Form terkontrol reusable (Create & Edit)
+│       ├── TaskCreatePanel.jsx    # Panel accordion untuk membuat task baru
+│       └── task-card/             # Kartu task beserta sub-komponennya
+│           ├── TaskCard.jsx         # Orchestrator kartu (menghubungkan useTaskCard ke sub-komponen)
+│           ├── TaskCardBody.jsx     # Judul, deskripsi, meta ID, progress badge
+│           ├── TaskCardFooter.jsx   # Quick status, tombol aksi, konfirmasi hapus 2 langkah
+│           ├── TaskCardEditView.jsx # Mode edit inline
+│           └── TaskCardError.jsx    # Banner error lokal per kartu
 │
-├── test/           # Test suite otomatis (Vitest + Testing Library)
-│   ├── setup.js          # Konfigurasi global DOM matchers
-│   ├── client.test.js    # Pengujian Axios client dan normalisasi error
-│   ├── useTasks.test.js  # Pengujian request bersamaan dan pencegahan mutasi ganda per task
-│   ├── useTaskPage.test.js # Pengujian CRUD, pencarian, visibilitas form, dan feedback toast
-│   ├── TaskBoard.test.jsx # Pengujian drag saat task diproses dan penanganan kegagalan drop
-│   ├── useToast.test.js  # Pengujian antrean notifikasi useToast
-│   ├── TaskCard.test.jsx # Pengujian unit interaksi kartu task (render, status, edit, delete, error)
-│   ├── Toast.test.jsx    # Pengujian rendering komponen Toast
-│   └── App.test.jsx      # Pengujian integrasi alur kerja CRUD pada komponen App
+├── hooks/              # Custom hooks (business logic & state controller)
+│   ├── useTasks.js          # State data, CRUD request, loading, tracking request per task
+│   ├── useTaskPage.js       # Controller halaman: search, filter, visibilitas form, fokus, toast
+│   ├── useTaskCard.js       # Controller kartu: edit, konfirmasi hapus, sync status, drag start
+│   ├── useBoardDragDrop.js  # Controller drag-and-drop antar kolom Kanban
+│   └── useToast.js          # Antrean notifikasi dengan auto-dismiss timer
 │
-├── App.jsx         # Pure presenter component (merangkai komponen UI tanpa inline logic)
-├── index.css       # Tailwind v4 theme tokens, keyframe animasi, dan utility classes
-└── main.jsx        # Entry point React ke DOM (#root)
+├── test/               # Test suite (Vitest + Testing Library)
+│   ├── setup.js
+│   ├── client.test.js, useTasks.test.js, useTaskPage.test.js, useToast.test.js
+│   └── App.test.jsx, TaskBoard.test.jsx, TaskCard.test.jsx, Toast.test.jsx
+│
+├── assets/image.png    # Screenshot preview untuk README root
+├── App.jsx             # Root presenter: merangkai layout, panel, dan board
+├── index.css           # Tailwind v4 theme tokens, keyframe animasi, utility classes
+└── main.jsx            # Entry point React ke DOM (#root)
 ```
+
+> Import memakai alias `@/` → `src/` (dikonfigurasi di `vite.config.js` dan `jsconfig.json`),
+> misalnya `import Button from '@/components/ui/Button'`.
+
+**Aturan penempatan komponen:**
+- `ui/` — generik, tidak tahu apa itu "task"; bisa dipindah ke project lain apa adanya.
+- `layout/` — kerangka halaman (header, footer).
+- `task/` — semua yang berkaitan dengan domain task.
 
 ---
 

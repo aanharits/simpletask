@@ -1,3 +1,5 @@
+import { TASK_STATUSES } from '@/constants/task'
+
 // Komponen footer kartu task: status selector dropdown, edit/delete actions, dan 2-step delete confirmation.
 export default function TaskCardFooter({
   task,
@@ -29,9 +31,9 @@ export default function TaskCardFooter({
               onChange={onStatusChange}
               title="Quickly change task status"
             >
-              <option value="Todo">Todo</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
+              {TASK_STATUSES.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
             </select>
           </div>
 

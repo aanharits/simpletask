@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { apiClient, normalizeError } from '../api/client'
-import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks'
+import { apiClient, normalizeError } from '@/api/client'
+import { getTasks, createTask, updateTask, deleteTask } from '@/api/tasks'
 
 describe('Axios Client & Tasks Service Unit Tests', () => {
   beforeEach(() => {

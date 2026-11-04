@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ToastContainer, { ToastItem } from '../components/Toast'
+import ToastContainer, { ToastItem } from '@/components/ui/Toast'
 
 describe('Toast Component Tests', () => {
   it('renders single success toast item properly', async () => {

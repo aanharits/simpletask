@@ -1,15 +1,17 @@
+import { TASK_STATUS } from '@/constants/task'
+
 const STATUS_PROGRESS = {
-  'Todo': {
+  [TASK_STATUS.TODO]: {
     label: '0%',
     badge: 'text-neutral-500 bg-neutral-100 border-neutral-200',
     icon: '○',
   },
-  'In Progress': {
+  [TASK_STATUS.IN_PROGRESS]: {
     label: '50%',
     badge: 'text-amber-700 bg-amber-50 border-amber-200',
     icon: '◑',
   },
-  'Done': {
+  [TASK_STATUS.DONE]: {
     label: '100%',
     badge: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     icon: '●',
@@ -18,8 +20,8 @@ const STATUS_PROGRESS = {
 
 // Komponen presentasi konten utama kartu task: title, description, dan meta badge.
 export default function TaskCardBody({ task }) {
-  const isDone = task.status === 'Done'
-  const prog = STATUS_PROGRESS[task.status] || STATUS_PROGRESS['Todo']
+  const isDone = task.status === TASK_STATUS.DONE
+  const prog = STATUS_PROGRESS[task.status] || STATUS_PROGRESS[TASK_STATUS.TODO]
 
   return (
     <div>

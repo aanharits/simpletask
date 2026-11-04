@@ -1,12 +1,14 @@
 import { useState, useMemo, useCallback } from 'react'
 import useTasks from './useTasks'
 import useToast from './useToast'
+import { FILTER_ALL } from '@/constants/task'
 
+// Controller halaman: menggabungkan data task (useTasks) dengan toast, pencarian, filter, dan visibilitas form.
 export default function useTaskPage() {
   const data = useTasks()
   const { tasks, createTask, updateTask, deleteTask } = data
   const { toasts, removeToast, showSuccess, showError } = useToast()
-  const [activeFilter, setActiveFilter] = useState('All')
+  const [activeFilter, setActiveFilter] = useState(FILTER_ALL)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(true)
   const [focusRequest, setFocusRequest] = useState(0)

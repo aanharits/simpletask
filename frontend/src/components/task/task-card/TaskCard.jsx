@@ -1,8 +1,9 @@
-import useTaskCard from '../hooks/useTaskCard'
-import TaskCardBody from './task-card/TaskCardBody'
-import TaskCardFooter from './task-card/TaskCardFooter'
-import TaskCardEditView from './task-card/TaskCardEditView'
-import TaskCardError from './task-card/TaskCardError'
+// Kartu task: menghubungkan controller useTaskCard dengan sub-komponen tampilan (body, footer, edit, error).
+import useTaskCard from '@/hooks/useTaskCard'
+import TaskCardBody from './TaskCardBody'
+import TaskCardFooter from './TaskCardFooter'
+import TaskCardEditView from './TaskCardEditView'
+import TaskCardError from './TaskCardError'
 
 export default function TaskCard({
   task,

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+// Controller kartu task: mode edit, konfirmasi hapus, sinkronisasi status, error lokal, dan drag start.
 export default function useTaskCard({
   task,
   onUpdate,

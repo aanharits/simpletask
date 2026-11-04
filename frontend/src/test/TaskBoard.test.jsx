@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import TaskBoard from '../components/TaskBoard'
+import TaskBoard from '@/components/task/TaskBoard'
 
 const task = { id: 1, title: 'First', description: '', status: 'Todo' }
 

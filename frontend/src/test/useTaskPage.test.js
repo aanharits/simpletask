@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
-import useTaskPage from '../hooks/useTaskPage'
-import { apiClient } from '../api/client'
+import useTaskPage from '@/hooks/useTaskPage'
+import { apiClient } from '@/api/client'
 
 const mockTasks = [
   { id: 1, title: 'Task 1', description: 'Desc 1', status: 'Todo' },

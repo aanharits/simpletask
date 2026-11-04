@@ -1,4 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import Button from '@/components/ui/Button'
+import { DEFAULT_TASK_STATUS, DESCRIPTION_MAX_LENGTH, TASK_STATUSES, TITLE_MAX_LENGTH } from '@/constants/task'
+
+const LABEL_CLASS = 'text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-600'
+const COUNTER_CLASS = 'text-[10px] sm:text-[11px] font-mono text-neutral-400'
+const FIELD_CLASS =
+  'w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out disabled:bg-neutral-50 disabled:text-neutral-400'
 
 // Komponen form input terkontrol untuk membuat task baru atau mengedit task yang ada.
 export default function TaskForm({
@@ -20,7 +27,7 @@ export default function TaskForm({
 
   const [title, setTitle] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
-  const [status, setStatus] = useState(initialData?.status || 'Todo')
+  const [status, setStatus] = useState(initialData?.status || DEFAULT_TASK_STATUS)
   const [error, setError] = useState('')
 
   // Memvalidasi input form sebelum mengirim payload ke fungsi onSubmit.
@@ -33,13 +40,13 @@ export default function TaskForm({
       return
     }
 
-    if (trimmedTitle.length > 120) {
-      setError('Title must not exceed 120 characters.')
+    if (trimmedTitle.length > TITLE_MAX_LENGTH) {
+      setError(`Title must not exceed ${TITLE_MAX_LENGTH} characters.`)
       return
     }
 
-    if (description.length > 2000) {
-      setError('Description must not exceed 2000 characters.')
+    if (description.length > DESCRIPTION_MAX_LENGTH) {
+      setError(`Description must not exceed ${DESCRIPTION_MAX_LENGTH} characters.`)
       return
     }
 
@@ -55,7 +62,7 @@ export default function TaskForm({
       if (!initialData) {
         setTitle('')
         setDescription('')
-        setStatus('Todo')
+        setStatus(DEFAULT_TASK_STATUS)
       }
     } catch (err) {
       setError(err.message || 'Failed to submit task.')
@@ -76,19 +83,19 @@ export default function TaskForm({
 
       <div>
         <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-          <label htmlFor={`${idPrefix}-title`} className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-600">
+          <label htmlFor={`${idPrefix}-title`} className={LABEL_CLASS}>
             Title <span className="text-red-500" aria-hidden="true">*</span>
           </label>
-          <span className="text-[10px] sm:text-[11px] font-mono text-neutral-400">{title.length}/120</span>
+          <span className={COUNTER_CLASS}>{title.length}/{TITLE_MAX_LENGTH}</span>
         </div>
         <input
           ref={titleRef}
           id={`${idPrefix}-title`}
           type="text"
-          className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out disabled:bg-neutral-50 disabled:text-neutral-400"
+          className={FIELD_CLASS}
           placeholder="e.g. Design API specification"
           value={title}
-          maxLength={120}
+          maxLength={TITLE_MAX_LENGTH}
           disabled={isSubmitting}
           onChange={(e) => {
             setTitle(e.target.value)
@@ -100,17 +107,17 @@ export default function TaskForm({
 
       <div>
         <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-          <label htmlFor={`${idPrefix}-description`} className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-600">
+          <label htmlFor={`${idPrefix}-description`} className={LABEL_CLASS}>
             Description <span className="text-neutral-400 font-normal lowercase tracking-normal">(optional)</span>
           </label>
-          <span className="text-[10px] sm:text-[11px] font-mono text-neutral-400">{description.length}/2000</span>
+          <span className={COUNTER_CLASS}>{description.length}/{DESCRIPTION_MAX_LENGTH}</span>
         </div>
         <textarea
           id={`${idPrefix}-description`}
-          className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out resize-y min-h-14.5 sm:min-h-18 disabled:bg-neutral-50 disabled:text-neutral-400"
+          className={`${FIELD_CLASS} resize-y min-h-14.5 sm:min-h-18`}
           placeholder="Add any extra context or requirements..."
           value={description}
-          maxLength={2000}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           rows={2}
           disabled={isSubmitting}
           onChange={(e) => setDescription(e.target.value)}
@@ -118,39 +125,30 @@ export default function TaskForm({
       </div>
 
       <div>
-        <label htmlFor={`${idPrefix}-status`} className="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1 sm:mb-1.5">
+        <label htmlFor={`${idPrefix}-status`} className={`block mb-1 sm:mb-1.5 ${LABEL_CLASS}`}>
           Status
         </label>
         <select
           id={`${idPrefix}-status`}
-          className="w-full px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-medium text-neutral-900 bg-white border border-neutral-200 hover:border-neutral-300 rounded-xl shadow-2xs focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900 transition-all duration-200 ease-out disabled:bg-neutral-50 cursor-pointer"
+          className={`${FIELD_CLASS} font-medium cursor-pointer`}
           value={status}
           disabled={isSubmitting}
           onChange={(e) => setStatus(e.target.value)}
         >
-          <option value="Todo">Todo</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
+          {TASK_STATUSES.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
         </select>
       </div>
 
       <div className="flex items-center gap-2 pt-1">
-        <button
-          type="submit"
-          className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-neutral-900 hover:bg-black active:scale-95 rounded-xl shadow-xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : buttonText}
-        </button>
+        </Button>
         {onCancel && (
-          <button
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-neutral-700 bg-white hover:bg-neutral-50 active:scale-95 border border-neutral-200 rounded-xl shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
+          <Button variant="secondary" onClick={onCancel} disabled={isSubmitting}>
             Cancel
-          </button>
+          </Button>
         )}
       </div>
     </form>
